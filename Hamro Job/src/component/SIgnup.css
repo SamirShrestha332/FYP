@@ -1,0 +1,87 @@
+.signup-container {
+    background: linear-gradient(to bottom right, #ff5f6d, #ffc371);
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 20px auto;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .signup-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .signup-container input, .signup-container select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+  }
+  
+.login-link {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.clickable {
+  color: blue;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}
+
+  
+  .signup-container button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .signup-container p {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .login-link {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .clickable {
+    color: blue;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .clickable:hover {
+    text-decoration: underline;
+  }
+  
+  
+  .signup-container a {
+    color: #ffcc00;
+    text-decoration: none;
+  }
+  
+  @media (max-width: 480px) {
+    .signup-container {
+      padding: 10px;
+    }
+  
+    .signup-container input, .signup-container select, .signup-container button {
+      padding: 8px;
+    }
+  }
+  
