@@ -1,0 +1,16 @@
+🔹 Steps to Push Changes to GitHub After Making Updates (CSS or Other Files)
+Whenever you modify files (like CSS, JS, etc.), follow these steps:
+
+1️⃣ Check the status of modified files
+	-git status
+2️⃣ Add the modified files to Git tracking
+        -git add .
+3️⃣ Commit the changes with a message
+   	 -git commit -m "Updated CSS and -		   other files"
+4️⃣ Push the changes to GitHub
+        -git push origin main
+
+ Quick shortshot for all the changes
+git status && git add . && git commit -m "Describe what you changed" && git push origin main
+
+

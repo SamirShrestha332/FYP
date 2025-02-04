@@ -1,0 +1,38 @@
+First time push to git hub
+ Steps for First-Time Git Users to Push a Project to GitHub
+If you're using Git for the first time, follow these steps:
+
+1️⃣ Configure Git (Only Once)
+
+git config --global user.name "Your Name"
+git config --global user.email "your-email@example.com"
+🔹 Replace "Your Name" and "your-email@example.com" with your actual GitHub name and email.
+
+2️⃣ Initialize Git in Your Project Folder
+
+git init
+🔹 This creates a hidden .git folder, which tracks your project.
+
+3️⃣ Connect Your Local Repo to GitHub
+
+git remote add origin https://github.com/YourUsername/YourRepo.git
+🔹 Replace YourUsername and YourRepo with your actual GitHub repository link.
+
+4️⃣ Add All Files to Git
+
+git add .
+🔹 Stages all files for commit.
+
+5️⃣ Commit the Files with a Message
+
+git commit -m "Initial commit"
+🔹 Saves the changes in the Git history.
+
+6️⃣ Push the Project to GitHub
+
+git push -u origin main
+🔹 Uploads your project to GitHub. The -u flag sets origin main as the default branch for future pushes.
+
+📌 First-Time Setup (Full Command in One Line)
+
+git config --global user.name "Your Name" && git config --global user.email "your-email@example.com" && git init && git remote add origin https://github.com/YourUsername/YourRepo.git && git add . && git commit -m "Initial commit" && git push -u origin main
