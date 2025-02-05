@@ -10,7 +10,7 @@ Whenever you modify files (like CSS, JS, etc.), follow these steps:
 4️⃣ Push the changes to GitHub
         -git push origin main
 
- Quick shortshot for all the changes
+ Quick shortcut for all the changes
 git status && git add . && git commit -m "Describe what you changed" && git push origin main
 
 

@@ -29,9 +29,12 @@ function Signup() {
   };
 
   return (
+    <div className="container">
+
+   
     <div className="signup-container">
       <form onSubmit={handleSubmit}>
-        <h2>Signup</h2>
+        <h2>Sign up</h2>
         <input 
           type="text" 
           placeholder="Username" 
@@ -83,13 +86,14 @@ function Signup() {
             />
           </>
         )}
-        <button type="submit">Signup</button>
+        <button type="submit">Sign up</button>
 
         {/* Login Link */}
         <p className="login-link">
           Already have an account? <a href="/">Login</a>
         </p>
       </form>
+    </div>
     </div>
   );
 }

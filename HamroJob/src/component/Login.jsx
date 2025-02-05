@@ -19,9 +19,12 @@ function Login() {
   };
 
   return (
+    <div className="container">
+
+   
     <div className="login-container">
       <form onSubmit={handleSubmit}>
-        <h2>Login</h2>
+        <h2>Log In</h2>
         <input 
           type="email" 
           placeholder="Email" 
@@ -43,6 +46,7 @@ function Login() {
           Don't have an account? <a href="/signup">Signup</a>
         </p>
       </form>
+    </div>
     </div>
   );
 }
