@@ -23,13 +23,14 @@ function Signup() {
         username, email, password, role, companyName, companyRole 
       });
       alert(response.data.message);
+      
     } catch (error) {
       alert(error.response?.data?.message || "Signup failed");
     }
   };
 
   return (
-    <div className="container">
+    <div className="container_signup">
 
    
     <div className="signup-container">
@@ -90,7 +91,7 @@ function Signup() {
 
         {/* Login Link */}
         <p className="login-link">
-          Already have an account? <a href="/">Login</a>
+          Already have an account? <a href="/login">Login</a>
         </p>
       </form>
     </div>
