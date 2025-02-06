@@ -6,11 +6,32 @@ Whenever you modify files (like CSS, JS, etc.), follow these steps:
 2️⃣ Add the modified files to Git tracking
         -git add .
 3️⃣ Commit the changes with a message
-   	 -git commit -m "Updated CSS and -		   other files"
+   	 -git commit -m "Updated CSS and other files"
 4️⃣ Push the changes to GitHub
         -git push origin main
 
  Quick shortcut for all the changes
 git status && git add . && git commit -m "Describe what you changed" && git push origin main
 
+Some additional example to commit in message:
 
+🔹 Feature Addition
+      git commit -m "✨ feat(login): implement login form with validation"
+
+🔹 Bug Fix
+      git commit -m "🐞 fix(api): resolve issue with missing email field"
+
+🔹 Style Changes (CSS or UI updates)
+      git commit -m " 🎨 style(signup): improve input field spacing and button color"
+ 
+🔹 Code Refactoring
+      git commit -m "♻️ refactor(login): simplify API call logic"
+
+🔹 Documentation Changes
+      git commit -m "📝 docs(readme): update instructions for setting up the project"
+
+🔹 Remove Unnecessary Code or Files
+      git commit -m "🧹Clean up code or remove unnecessary files"
+
+🔹 Testing for Authentication
+      git commit -m "✅Add unit tests for user authentication"
