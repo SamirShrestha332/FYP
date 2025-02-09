@@ -16,7 +16,7 @@ git status && git add . && git commit -m "Describe what you changed" && git push
 Some additional example to commit in message:
 
 🔹 Feature Addition
-      git commit -m "✨ feat(login): implement login form with validation"
+      git commit -m "✨ feat(Home): Implement Homepage in the project"
 
 🔹 Bug Fix
       git commit -m "🐞 fix(api): resolve issue with missing email field"

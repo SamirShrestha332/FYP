@@ -17,7 +17,7 @@ function Login() {
       });
 
       if (response.data.status === 'success') {
-        localStorage.setItem('token', response.data.token); // Store token
+       
         navigate('/'); // Navigate before alert to avoid delay
         
       } else {

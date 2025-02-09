@@ -12,6 +12,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  
+}
+nav{
+  
+  width: 40%;
+  
 }
 
 .nav nav ul {
@@ -19,6 +25,7 @@
   margin: 0;
   padding: 0;
   display: flex;
+  background: rgba(255, 255, 255, 0.304);
 }
 
 .nav nav li {
@@ -30,6 +37,8 @@
   color: #333;
   position: relative; /* Needed for positioning the underline */
   transition: color 0.3s ease; /* Smooth color transition */
+  font-size: 1.2rem;
+  
 }
 
 .nav nav a:hover {
@@ -55,6 +64,10 @@
 .nav-controls {
   display: flex;
   align-items: center;
+
+  justify-content: space-between;
+
+  padding: 10px;
 }
 
 .search-icon {
@@ -63,15 +76,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
+  font-size: 1.3rem;
 }
 
 
 
 .signin-button,
 .login-button {
-  padding: 10px 23px;
+  padding: 8px 25px;
   border: none;
-  border-radius: 20px;
+  border-radius: 30px;
   cursor: pointer;
 }
 
@@ -79,11 +94,13 @@
   background-color: #007bff;
   color: white;
   margin-right: 10px;
+  font-size: 1rem;
 }
 
 .login-button {
   background-color: #eee;
   color: #333;
+  font-size: 1rem;
 }
 
 
@@ -161,19 +178,29 @@
   .nav {
    flex-wrap: wrap;
   
-   flex-direction: column;
+  
   }
   .logo .Logo {
     width: 200px;
-  }
-  .nav nav ul {
-    flex-wrap: nowrap; /* Prevent wrapping */
-    justify-content: flex-start; /* Align navigation to the left */
-    margin: 30px;
-  }
 
+  }
+ 
+  .nav nav ul {
+    flex-wrap: wrap; /* Prevent wrapping */
+    justify-content: flex-end; /* Align navigation to the left */
+    
+  }
+ .nav nav ul li a{
+    font-size: 1rem;
+  }
+.signin-button{
+  font-size: .8rem;
+}
+.login-button{
+  font-size: .8rem;
+}
   .nav-controls {
-    flex-wrap: nowrap; /* Prevent wrapping */
+    flex-wrap: wrap; /* Prevent wrapping */
     justify-content: flex-end; /* Align controls to the right */
   }
 
