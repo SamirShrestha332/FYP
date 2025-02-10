@@ -94,6 +94,9 @@
     color: #2881c6;
     text-decoration: underline;
   }
+  .error-message{
+    color: red;
+  }
   
   @media (max-width: 480px) {
     .signup-container {
