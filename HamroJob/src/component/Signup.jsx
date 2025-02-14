@@ -37,7 +37,7 @@ function Signup() {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/api/signup", data);
+            const response = await axios.post("http://localhost:3000/signup", data);
             alert(response.data.message);
             // Reset the form after successful signup (optional)
             setFirstName("");

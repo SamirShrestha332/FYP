@@ -5,7 +5,7 @@ import bodyParser from 'body-parser'; // Correct import for body-parser
 import bcrypt from 'bcrypt';         // Correct import for bcrypt
 
 const app = express();
-const port = 5000;
+const port = 3000;
 
 app.use(cors());
 app.use(bodyParser.json()); // No destructuring needed; use directly
@@ -22,7 +22,7 @@ const db = createPool({
 });
 
 // Signup
-app.post('/api/signup', async (req, res) => {
+app.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password, role, companyName, companyRole } = req.body;
 
     try {
@@ -45,7 +45,7 @@ app.post('/api/signup', async (req, res) => {
 });
 
 // Login
-app.post('/api/login', (req, res) => {
+app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     const query = 'SELECT * FROM users WHERE email = ?';
