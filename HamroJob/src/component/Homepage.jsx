@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import "./Homepage.css";
 
+
 function Homepage() {
   const navigate = useNavigate();
 
@@ -14,7 +15,40 @@ function Homepage() {
     navigate('/login');
   };
 
+    const jobs = [
+      {
+        companyLogo: "/src/assets/Companylogo.png",
+        jobDetails: "Lorem ipsum dolor sitolore, ut nihil sed eos blanditiis error rerum?",
+        time: "1 day ago",
+      },
+      {
+        companyLogo: "/src/assets/Companylogo.png",
+        jobDetails: "Another job description here.  A longer one this time, to test the layout.",
+        time: "3 days ago",
+      },
+      {
+        companyLogo: "/src/assets/Companylogo.png",
+        jobDetails: "Yet another job opportunity! This one sounds exciting.",
+        time: "5 days ago",
+      },
+      {
+        companyLogo: "/src/assets/Companylogo.png",
+        jobDetails: "A fourth job posting.  We're filling up the grid!",
+        time: "1 week ago",
+      },
+      {
+        companyLogo: "/src/assets/Companylogo.png",
+        jobDetails: "Fifth job -  almost there! Testing the responsiveness.",
+        time: "2 weeks ago",
+      },
+      {
+        companyLogo: "/src/assets/Companylogo.png",
+        jobDetails: "The sixth and final job.  Let's see how it looks!",
+        time: "1 month ago",
+      },
+    ];
   return (
+
     <div className="Homepage_container"> {/* Removed unnecessary <> </> fragments */}
       <div className="homepage">
 
@@ -50,7 +84,26 @@ function Homepage() {
           <div className="hero-image"><img src="/src/assets/HeroImage.jpeg" alt="Hero Image" /></div>
         </section>
 
-        <div className="jobsection"></div>
+        <div className="jobsection">
+          <h1>Find your Job</h1>
+          <p>More than 100 job offers are waiting for you, open-up yourself to a new world of opportunities.</p>
+          <div className="job_container">
+        {jobs.map((job, index) => (
+          <div className="jobs" key={index}>
+            <div className="image_sections">
+              <img src={job.companyLogo} alt="companylogo" />
+            </div>
+            <div className="job_info">
+              <p className="jobdetails">{job.jobDetails}</p>
+              <div className="jobtime_button">
+                <p className="time">{job.time}</p>
+                <button>View Job</button> {/* Corrected button text */}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+        </div>
         <div className="About_us_section"></div>
         <div className="skillcontent_section"></div>
 

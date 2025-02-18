@@ -15,7 +15,7 @@ const db = createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'hamro_job', // <-- Change to your database name!
+    database: 'hamro_job', 
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

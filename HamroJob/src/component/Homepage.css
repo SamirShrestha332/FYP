@@ -249,4 +249,71 @@ nav{
   .skillcontent_section {
     width: 80%; /* Adjust width as needed */
   }
+
+}
+/* JobSection.css */
+.jobsection {
+  padding: 20px; /* Add some padding around the section */
+  text-align: center; /* Center the heading and paragraph */
+}
+
+.job_container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Responsive grid */
+  gap: 20px; /* Spacing between grid items */
+  padding: 20px;
+}
+
+.jobs {
+  border: 1px solid #ccc; /* Add a border to each job card */
+  padding: 15px;
+  display: flex; /* Use flexbox for layout within each job */
+  flex-direction: column; /* Align items vertically */
+  height: 100%; /* Make sure each card takes up full height of row */
+}
+
+.image_sections {
+  margin-bottom: 10px;
+}
+
+.image_sections img {
+  max-width: 100px; /* Limit image width */
+  height: auto;
+}
+
+.job_info {
+  flex-grow: 1; /* Allow job info to take up available space */
+}
+
+.jobdetails {
+  margin-bottom: 10px;
+  text-align: left; /* Align job details text to the left */
+}
+
+.jobtime_button {
+  display: flex;
+  justify-content: space-between; /* Align time and button */
+  align-items: center;
+  margin-top: auto; /* Push to the bottom of the card */
+}
+
+.time {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.jobtime_button button {
+  background-color: #007bff; /* Example button color */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Media query for smaller screens (optional) */
+@media (max-width: 768px) {
+  .job_container {
+    grid-template-columns: 1fr; /* Single column on smaller screens */
+  }
 }
