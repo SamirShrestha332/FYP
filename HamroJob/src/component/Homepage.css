@@ -12,7 +12,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+  position:sticky;
+  top: 0px;
+  background-color: white;
+  z-index: 2;
 }
 nav{
   
@@ -105,7 +108,7 @@ nav{
 
 
 
-.jobsection,
+
 .About_us_section,
 .skillcontent_section {
  
@@ -244,15 +247,16 @@ nav{
     border-radius: 0 5px 5px 0;
   }
 
-  .jobsection,
-  .About_us_section,
+  
+ 
   .skillcontent_section {
     width: 80%; /* Adjust width as needed */
   }
 
 }
-/* JobSection.css */
+
 .jobsection {
+  height: 100vh;
   padding: 20px; /* Add some padding around the section */
   text-align: center; /* Center the heading and paragraph */
 }
@@ -261,15 +265,16 @@ nav{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Responsive grid */
   gap: 20px; /* Spacing between grid items */
-  padding: 20px;
+  padding: 60px;
 }
 
 .jobs {
   border: 1px solid #ccc; /* Add a border to each job card */
   padding: 15px;
   display: flex; /* Use flexbox for layout within each job */
-  flex-direction: column; /* Align items vertically */
   height: 100%; /* Make sure each card takes up full height of row */
+  gap: 30px;
+  margin: 10px;
 }
 
 .image_sections {
@@ -277,8 +282,10 @@ nav{
 }
 
 .image_sections img {
-  max-width: 100px; /* Limit image width */
+  max-width: 60px; /* Limit image width */
   height: auto;
+  border-radius: 50%;
+  box-shadow: 0px 0px 5px gray;
 }
 
 .job_info {
@@ -289,12 +296,18 @@ nav{
   margin-bottom: 10px;
   text-align: left; /* Align job details text to the left */
 }
+.companyname{
+  margin-bottom: 10px;
+  text-align: left; 
+  font-weight: 500;
+}
 
 .jobtime_button {
   display: flex;
   justify-content: space-between; /* Align time and button */
   align-items: center;
   margin-top: auto; /* Push to the bottom of the card */
+  padding-top: 10px;
 }
 
 .time {
@@ -310,10 +323,196 @@ nav{
   border-radius: 4px;
   cursor: pointer;
 }
+.View_All_Button{
+  background-color: white;
+  color: rgb(0, 0, 0);
+  padding: 8px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.301);
+  border-radius: 4px;
+  cursor: pointer;
+  width: 200px;
+  height: 50px;
+  font-size: 1rem;
+  border-radius: 30px;
+}
 
 /* Media query for smaller screens (optional) */
 @media (max-width: 768px) {
   .job_container {
     grid-template-columns: 1fr; /* Single column on smaller screens */
+    font-size: 0.8rem;
+  }
+  .jobsection{
+    height: auto;
   }
 }
+
+.About_us_section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px;
+  gap: 50px;
+  width: 100%;
+ 
+  text-align: left;
+  margin-top: 40px;
+  min-height: 100vh;
+  border: none;
+}
+
+.image-section-aboutus {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  max-width: 60%;
+}
+
+
+.image-section-aboutus img:first-child {
+  max-width: 90%;
+  height: auto;
+  z-index: 0;
+  opacity: 0.8;
+  border-radius: 12px;
+}
+
+.image-section-aboutus img:last-child {
+  max-width: 90%;
+  height: auto;
+  position: absolute;
+  top: 70%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.side-container {
+  flex: 1;
+  padding: 20px;
+  max-width: 40%;
+}
+
+.title-container h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.description-container {
+  margin-bottom: 20px;
+}
+
+.more-info-label {
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.buttons-container button {
+  padding: 12px 24px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1em;
+}
+
+.buttons-container button:hover {
+  background-color: #d0d0d0;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .About_us_section {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 20px;
+  }
+  .image-section-aboutus {
+    max-width: 100%;
+    margin-bottom: 100px;
+}
+   .side-container {
+      flex: none;
+      width: 100%;
+      max-width: none;
+  }
+
+  .image-section-aboutus img:last-child {
+      left: 50%;
+      top: 80%;
+  }
+  .image-section-aboutus img:first-child {
+    max-width: 100%;
+}
+
+.image-section-aboutus img:last-child {
+    max-width: 100%;
+    left: 65%;
+    
+}
+
+  .buttons-container {
+      max-width: 100%;
+  }
+}
+
+/* Media query for tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .About_us_section {
+      flex-direction: column;
+      padding: 30px;
+      height: auto;
+  }
+
+  .image-section-aboutus {
+      max-width: 60%;
+      margin-bottom: 100px;
+  }
+
+  .image-section-aboutus img:first-child {
+      max-width: 100%;
+  }
+
+  .image-section-aboutus img:last-child {
+      max-width: 100%;
+      left: 65%;
+      
+  }
+
+  .side-container {
+   text-align: center;
+      max-width: 78%;
+  }
+
+  .title-container h1 {
+      font-size: 2em;
+  }
+
+  .buttons-container button {
+      padding: 10px 20px;
+  }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  
+  .job_container {
+    grid-template-columns: 1fr; /* Single column on smaller screens */
+    font-size: 0.8rem;
+  }
+  .jobsection{
+    height: auto;
+  }
+
+  }

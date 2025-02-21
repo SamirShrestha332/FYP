@@ -2,8 +2,8 @@ import React from "react";
 import { useNavigate } from 'react-router-dom';
 
 import "./Homepage.css";
-
-
+import heroimage1 from "/src/assets/Heroimage1.jpeg";
+import heroimage2 from "/src/assets/Heroimage2.jpeg";
 function Homepage() {
   const navigate = useNavigate();
 
@@ -19,37 +19,43 @@ function Homepage() {
       {
         companyLogo: "/src/assets/Companylogo.png",
         jobDetails: "Lorem ipsum dolor sitolore, ut nihil sed eos blanditiis error rerum?",
+        companyname:"Xyz company",
         time: "1 day ago",
       },
       {
         companyLogo: "/src/assets/Companylogo.png",
         jobDetails: "Another job description here.  A longer one this time, to test the layout.",
+        companyname:"Xyz company",
         time: "3 days ago",
       },
       {
         companyLogo: "/src/assets/Companylogo.png",
         jobDetails: "Yet another job opportunity! This one sounds exciting.",
+        companyname:"Xyz company",
         time: "5 days ago",
       },
       {
         companyLogo: "/src/assets/Companylogo.png",
         jobDetails: "A fourth job posting.  We're filling up the grid!",
+        companyname:"Xyz company",
         time: "1 week ago",
       },
       {
         companyLogo: "/src/assets/Companylogo.png",
         jobDetails: "Fifth job -  almost there! Testing the responsiveness.",
-        time: "2 weeks ago",
+        companyname:"Xyz company",
+        time: "2 week ago",
       },
       {
         companyLogo: "/src/assets/Companylogo.png",
         jobDetails: "The sixth and final job.  Let's see how it looks!",
-        time: "1 month ago",
+        companyname:"Xyz company",
+        time: "1month ago",
       },
     ];
   return (
 
-    <div className="Homepage_container"> {/* Removed unnecessary <> </> fragments */}
+    <div className="Homepage_container"> 
       <div className="homepage">
 
         <div className="nav">
@@ -95,6 +101,7 @@ function Homepage() {
             </div>
             <div className="job_info">
               <p className="jobdetails">{job.jobDetails}</p>
+              <div className="companyname">{job.companyname}</div>
               <div className="jobtime_button">
                 <p className="time">{job.time}</p>
                 <button>View Job</button> {/* Corrected button text */}
@@ -103,9 +110,38 @@ function Homepage() {
           </div>
         ))}
       </div>
+      <button className="View_All_Button">View all jobs</button>
         </div>
-        <div className="About_us_section"></div>
-        <div className="skillcontent_section"></div>
+
+         <div className="About_us_section">
+         
+            <div className="image-section-aboutus">
+            
+                <img src={heroimage1} alt="Workplace Scene 1" />
+                <img src={heroimage2} alt="Workplace Scene 2" />
+            </div>
+            <div className="side-container">
+                <div className="title-container">
+                    <h1>MOOVIjob</h1>
+                </div>
+                <div className="description-container">
+                    <p>
+                        Moovijob.com is a privileged partner if you want to inquire information about Employment & Careers in the territory of the Grand-Duchy of Luxembourg.
+                    </p>
+                </div>
+                <div className="more-info-label">
+                    <strong>More information</strong>
+                </div>
+                <div className="buttons-container">
+                    <button>Apply for online job offers.</button>
+                    <button>Consult the calendar of our events.</button>
+                    <button>Consult our training offers.</button>
+                </div>
+            </div>
+        </div>
+        
+        <div className="create-account"></div>
+        
 
       </div>
     </div>
