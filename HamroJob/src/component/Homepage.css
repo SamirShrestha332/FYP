@@ -14,9 +14,13 @@
   justify-content: space-between;
   position:sticky;
   top: 0px;
-  background-color: white;
+  background-color: #f8f8f8; /* Light background */
   z-index: 2;
 }
+.nav-controls button {
+  box-shadow: 0px 5px 10px gray;
+}
+
 nav{
   
   width: 40%;
@@ -141,11 +145,13 @@ nav{
   .hero h1 {
     font-size: 3rem; /* Adjust font size as needed */
     margin-bottom: 20px;
+    
   }
   
   .hero p {
     font-size: 1.2rem; /* Adjust font size as needed */
     margin-bottom: 30px;
+   
   }
   
   .search-bar {
@@ -260,6 +266,11 @@ nav{
   padding: 20px; /* Add some padding around the section */
   text-align: center; /* Center the heading and paragraph */
 }
+.jobsection .Heading{
+  font-size:3rem;
+  font-weight: 400px;
+
+}
 
 .job_container {
   display: grid;
@@ -357,7 +368,7 @@ nav{
  
   text-align: left;
   margin-top: 40px;
-  min-height: 100vh;
+  min-height: 80vh;
   border: none;
 }
 
@@ -432,13 +443,27 @@ nav{
 .buttons-container button:hover {
   background-color: #d0d0d0;
 }
+.AboutUs_title{
+  font-size: 2rem;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight:400;
+  flex-direction: column;
 
+ 
+}
 /* Media query for smaller screens */
 @media (max-width: 768px) {
   .About_us_section {
       flex-direction: column;
       align-items: stretch;
       padding: 20px;
+  }
+  .AboutUs_title{
+  flex-direction: row;
+ letter-spacing: 4px;
   }
   .image-section-aboutus {
     max-width: 100%;
@@ -476,6 +501,10 @@ nav{
       padding: 30px;
       height: auto;
   }
+  .AboutUs_title{
+    flex-direction: row;
+   letter-spacing: 4px;
+    }
 
   .image-section-aboutus {
       max-width: 60%;
@@ -516,3 +545,285 @@ nav{
   }
 
   }
+
+
+.create-account-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px;
+  background-color: #f8f8f8; /* Light background */
+}
+
+.create-account-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.create-account-title {
+  font-size: 2.5rem;
+ 
+  margin-bottom: 10px;
+}
+
+.create-account-free {
+  color: #007bff; /* Pink */
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.create-account-description {
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.create-account-advantages {
+  margin-top: 30px;
+  font-weight: bold;
+}
+
+.create-account-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.create-account-signup,
+.create-account-login {
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  margin: 0 10px;
+}
+
+.create-account-signup {
+  background-color: #007bff; /* Pink */
+  color: white;
+}
+
+.create-account-login {
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .create-account-title {
+    font-size: 2rem;
+  }
+
+  .create-account-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .create-account-signup,
+  .create-account-login {
+    margin: 10px 0;
+  }
+}
+
+.create-account-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px;
+  background-color: #f8f8f8; /* Light background */
+}
+
+.create-account-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.create-account-title {
+  font-size: 2.5rem;
+
+  margin-bottom: 10px;
+}
+
+.create-account-free {
+  color: #007bff; /* Pink */
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.create-account-description {
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.create-account-advantages {
+  margin-top: 30px;
+  font-weight: bold;
+}
+
+.create-account-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.create-account-signup,
+.create-account-login {
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  margin: 0 10px;
+}
+
+.create-account-signup {
+  background-color: #007bff; /* Pink */
+  color: white;
+}
+
+.create-account-login {
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .create-account-title {
+    font-size: 2rem;
+  }
+
+  .create-account-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .create-account-signup,
+  .create-account-login {
+    margin: 10px 0;
+  }
+}
+
+
+
+.footer {
+  background-color: white; /* White background */
+  color: #333; /* Dark text */
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+}
+
+.footer-logo .Logo {
+  width: 150px; /* Adjust logo size */
+  margin-right: 20px;
+}
+
+.social-icons {
+  display: flex;
+}
+
+.social-icons ion-icon {
+  font-size: 1.2rem;
+  margin-left: 10px;
+  color: #888; /* Light gray icons */
+  cursor: pointer;
+}
+
+.footer-actions button {
+  padding: 8px 15px;
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 20px;
+  background-color: white;
+  color: #333;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.footer-actions .recruiter-button {
+  border-color: #007bff; /* Blue border for recruiter button */
+  color: #007bff;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #eee; /* Light border */
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #333;
+  margin-right: 15px;
+}
+
+.copyright {
+  color: #888;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .footer-top {
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left */
+  }
+
+  .footer-logo {
+    margin-bottom: 15px; /* Add space below logo */
+  }
+
+  .social-icons {
+    margin-bottom: 15px; /* Add space below social icons */
+  }
+
+  .footer-actions {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: flex-start; /* Align buttons to the left */
+  }
+
+  .footer-actions button {
+    margin-left: 0; /* Remove left margin from buttons */
+    margin-bottom: 10px; /* Add space below each button */
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start; /* Align links and copyright to the left */
+  }
+
+  .footer-links {
+    margin-bottom: 10px;
+  }
+
+  .footer-links a {
+    margin-right: 0; /* Remove right margin from links */
+    margin-bottom: 5px; /* Add space below each link */
+    display: block; /* Make links stack vertically */
+  }
+}
+
+.social-icons ion-icon {
+  font-size: 1.2rem;
+  margin-left: 10px;
+  color: #888; /* Light gray icons */
+  cursor: pointer;
+  transition: color 0.3s ease; /* Add a transition for smooth hover effect */
+}
+
+.social-icons ion-icon:hover {
+  color: var(--icon-color); /* Use the CSS variable for hover color */
+}

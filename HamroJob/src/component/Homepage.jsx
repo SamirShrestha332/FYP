@@ -91,7 +91,7 @@ function Homepage() {
         </section>
 
         <div className="jobsection">
-          <h1>Find your Job</h1>
+          <p className="Heading">Find your Job</p>
           <p>More than 100 job offers are waiting for you, open-up yourself to a new world of opportunities.</p>
           <div className="job_container">
         {jobs.map((job, index) => (
@@ -114,36 +114,96 @@ function Homepage() {
         </div>
 
          <div className="About_us_section">
-         
+         <div className="AboutUs_title">
+          <p>A</p>
+          <p>B</p>
+          <p>O</p>
+          <p>U</p>
+          <p>T</p>
+          <br/>
+          <p>U</p>
+          <p>S</p>
+
+         </div>
+        
             <div className="image-section-aboutus">
-            
+            <img src={heroimage2} alt="Workplace Scene 2" />
                 <img src={heroimage1} alt="Workplace Scene 1" />
-                <img src={heroimage2} alt="Workplace Scene 2" />
+                
             </div>
             <div className="side-container">
                 <div className="title-container">
-                    <h1>MOOVIjob</h1>
+                    <h1 >Hamrojob</h1>
                 </div>
                 <div className="description-container">
                     <p>
-                        Moovijob.com is a privileged partner if you want to inquire information about Employment & Careers in the territory of the Grand-Duchy of Luxembourg.
+                        HamroJob.com is a privileged partner if you want to inquire information about Employment .
                     </p>
                 </div>
                 <div className="more-info-label">
                     <strong>More information</strong>
                 </div>
                 <div className="buttons-container">
-                    <button>Apply for online job offers.</button>
-                    <button>Consult the calendar of our events.</button>
-                    <button>Consult our training offers.</button>
+                    <a href="#">Apply for online job offers.</a>
+                    <a href="#">Consult the calendar of our events.</a>
+                    <a href="#">Consult our training offers.</a>
                 </div>
             </div>
         </div>
         
-        <div className="create-account"></div>
-        
+        <div className="create-account-section">
+          <div className="create-account-content">
+            <h2 className="create-account-title">Create an account</h2>
+            <p className="create-account-free">FREE & SECURED</p>
+            <p className="create-account-description">Quickly apply to ads and much more...</p>
+            <p className="create-account-description">Join the Hamrojob.com community and discover all that your account can offer you.</p>
+            <p className="create-account-advantages">The advantages of the Moovijob.com account</p>
+            <div className="create-account-buttons">
+              <button className="create-account-signup" onClick={handleSignUpClick}>Sign up</button>
+              <button className="create-account-login" onClick={handleLoginClick}>Log in</button>
+            </div>
+          </div>
+        </div>
 
       </div>
+
+ 
+
+  
+
+<div className="footer">
+  <div className="footer-top">
+    <div className="footer-logo">
+      <img className="Logo" src="/src/assets/Logo.png" alt="Moovijob Logo" />
+      <div className="social-icons">
+        <ion-icon name="logo-facebook"></ion-icon>
+        <ion-icon name="logo-instagram"></ion-icon>
+        <ion-icon name="logo-twitter"></ion-icon>
+        <ion-icon name="logo-youtube"></ion-icon>
+        <ion-icon name="logo-linkedin"></ion-icon>
+      </div>
+    </div>
+    <div className="footer-actions">
+      <button className="login-button">Log in</button>
+      <button className="signup-button">Sign up</button>
+      <button className="recruiter-button">Recruiter</button>
+    </div>
+  </div>
+  <div className="footer-bottom">
+    <div className="footer-links">
+      <a href="#">Français</a>
+      <a href="#">English</a>
+      <a href="#">Deutsch</a>
+      <a href="#">Contact us</a>
+      <a href="#">Partners</a>
+      <a href="#">Legal Information</a>
+      <a href="#">Cookies parameters</a>
+    </div>
+    <p className="copyright">&copy; All rights reserved Hamrojob.com</p>
+  </div>
+</div>
+
+
     </div>
   );
 }
