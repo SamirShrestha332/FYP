@@ -4,5 +4,8 @@
   padding: 0px;
   box-sizing: border-box;
   font-family: "Poppins", serif;
-  background-color: #f8f8f8; /* Light background */
+ 
+}
+body{
+  background-color: white;
 }

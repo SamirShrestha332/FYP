@@ -80,6 +80,67 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Admin Login
+app.post('/admin/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        // Query to find admin user
+        const query = 'SELECT * FROM admin_users WHERE email = ?';
+        
+        db.query(query, [email], async (err, results) => {
+            if (err) {
+                console.error('Admin login error:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Something went wrong, please try again.' 
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Invalid email or password' 
+                });
+            }
+
+            const admin = results[0];
+            
+            // Compare password
+            // const passwordMatch = await bcrypt.compare(password, admin.password);
+            // For plain text passwords (not recommended for production)
+            const passwordMatch = password === admin.password;
+            
+            if (!passwordMatch) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Invalid email or password' 
+                });
+            }
+
+            // Remove password from response
+            delete admin.password;
+            
+            // Create a simple token (in production, use JWT)
+            const token = Math.random().toString(36).substring(2, 15) + 
+                          Math.random().toString(36).substring(2, 15);
+            
+            res.json({
+                success: true,
+                message: 'Login successful',
+                admin,
+                token
+            });
+        });
+    } catch (error) {
+        console.error('Admin login error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });

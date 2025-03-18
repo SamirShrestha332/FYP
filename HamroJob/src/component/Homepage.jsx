@@ -157,7 +157,7 @@ function Homepage() {
             <p className="create-account-free">FREE & SECURED</p>
             <p className="create-account-description">Quickly apply to ads and much more...</p>
             <p className="create-account-description">Join the Hamrojob.com community and discover all that your account can offer you.</p>
-            <p className="create-account-advantages">The advantages of the Moovijob.com account</p>
+            <p className="create-account-advantages">The advantages of the Hamrojob.com account</p>
             <div className="create-account-buttons">
               <button className="create-account-signup" onClick={handleSignUpClick}>Sign up</button>
               <button className="create-account-login" onClick={handleLoginClick}>Log in</button>
@@ -174,7 +174,7 @@ function Homepage() {
 <div className="footer">
   <div className="footer-top">
     <div className="footer-logo">
-      <img className="Logo" src="/src/assets/Logo.png" alt="Moovijob Logo" />
+      <img className="Logo" src="/src/assets/Logo.png" alt="Hamrojob Logo" />
       <div className="social-icons">
         <ion-icon name="logo-facebook"></ion-icon>
         <ion-icon name="logo-instagram"></ion-icon>
@@ -186,7 +186,7 @@ function Homepage() {
     <div className="footer-actions">
       <button className="login-button">Log in</button>
       <button className="signup-button">Sign up</button>
-      <button className="recruiter-button">Recruiter</button>
+      
     </div>
   </div>
   <div className="footer-bottom">
