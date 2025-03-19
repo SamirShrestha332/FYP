@@ -24,8 +24,7 @@ function Applications() {
         // Fetch applications data
         const fetchApplications = async () => {
             try {
-                // In a real app, you would fetch this data from your API
-                // For now, we'll use mock data
+                
                 
                 // Mock data for demonstration
                 const mockApplications = [

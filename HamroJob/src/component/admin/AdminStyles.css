@@ -63,6 +63,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   display: block;
+  padding: 20 auto;
   max-height: 600px;
   overflow-y: auto;
   overflow-x: auto;

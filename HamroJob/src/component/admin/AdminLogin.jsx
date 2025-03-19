@@ -6,14 +6,26 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
 function AdminLogin() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate();
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [redirectNow, setRedirectNow] = useState(false);
+    
+    // Validation states
+    const [emailValid, setEmailValid] = useState(null);
+    const [passwordValid, setPasswordValid] = useState(null);
+
+    useEffect(() => {
+        // Check if admin is already logged in
+        const adminUser = localStorage.getItem('adminUser');
+        if (adminUser) {
+            navigate('/admin/dashboard');
+        }
+    }, [navigate]);
 
     // Add effect for redirection
     useEffect(() => {
@@ -22,10 +34,51 @@ function AdminLogin() {
         }
     }, [redirectNow, navigate]);
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        setError(null);
+    const validateEmail = (value) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!value.trim() || !emailRegex.test(value)) {
+            setEmailValid(false);
+            return false;
+        }
+        setEmailValid(true);
+        return true;
+    };
+
+    const validatePassword = (value) => {
+        if (value.length < 6) {
+            setPasswordValid(false);
+            return false;
+        }
+        setPasswordValid(true);
+        return true;
+    };
+
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setEmail(value);
+        validateEmail(value);
+    };
+
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setPassword(value);
+        validatePassword(value);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Validate all fields before submission
+        const isEmailValid = validateEmail(email);
+        const isPasswordValid = validatePassword(password);
+        
+        if (!isEmailValid || !isPasswordValid) {
+            setError('Please correct the errors in the form.');
+            return;
+        }
+
         setLoading(true);
+        setError(null);
 
         try {
             const response = await axios.post("http://localhost:3000/admin/login", {
@@ -57,9 +110,9 @@ function AdminLogin() {
             } else {
                 setError(response.data.message || "Login failed. Invalid credentials.");
             }
-        } catch (error) {
-            console.error("Admin Login Error:", error);
-            setError(error.response?.data?.message || "A login error occurred.");
+        } catch (err) {
+            console.error("Admin Login Error:", err);
+            setError(err.response?.data?.message || "A login error occurred.");
         } finally {
             setLoading(false);
         }
@@ -79,35 +132,53 @@ function AdminLogin() {
 
     return (
         <div className="admin-login-container">
-            <div className="admin-login-form">
+            <form className="admin-login-form" onSubmit={handleSubmit}>
                 <h2>Admin Login</h2>
-                {error && <p className="error-message">{error}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
-                </form>
-            </div>
+                
+                {error && <div className="error-message">{error}</div>}
+                
+                <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        className={emailValid === false ? 'is-invalid' : emailValid === true ? 'is-valid' : ''}
+                        placeholder="Enter admin email"
+                        autoComplete="email"
+                        required
+                    />
+                    {emailValid === false && (
+                        <div className="validation-feedback invalid-feedback">
+                            Please enter a valid email address
+                        </div>
+                    )}
+                </div>
+                
+                <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        className={passwordValid === false ? 'is-invalid' : passwordValid === true ? 'is-valid' : ''}
+                        placeholder="Enter admin password"
+                        autoComplete="current-password"
+                        required
+                    />
+                    {passwordValid === false && (
+                        <div className="validation-feedback invalid-feedback">
+                            Password must be at least 6 characters
+                        </div>
+                    )}
+                </div>
+                
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Login'}
+                </button>
+            </form>
 
             <Modal
                 isOpen={modalIsOpen}
@@ -123,7 +194,8 @@ function AdminLogin() {
                         backgroundColor: '#fff',
                         padding: '20px',
                         borderRadius: '5px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        width: '300px'
                     }
                 }}
             >

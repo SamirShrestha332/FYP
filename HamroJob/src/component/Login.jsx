@@ -13,9 +13,56 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
     const [modalMessage, setModalMessage] = useState(''); // Modal message
+    
+    // Add validation states
+    const [emailValid, setEmailValid] = useState(null);
+    const [passwordValid, setPasswordValid] = useState(null);
+    
+    // Validation functions
+    const validateEmail = (value) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!value.trim() || !emailRegex.test(value)) {
+            setEmailValid(false);
+            return false;
+        }
+        setEmailValid(true);
+        return true;
+    };
+    
+    const validatePassword = (value) => {
+        if (!value || value.length < 1) {
+            setPasswordValid(false);
+            return false;
+        }
+        setPasswordValid(true);
+        return true;
+    };
+    
+    // Handle input changes with validation
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setEmail(value);
+        validateEmail(value);
+    };
+    
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setPassword(value);
+        validatePassword(value);
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        
+        // Validate all fields before submission
+        const isEmailValid = validateEmail(email);
+        const isPasswordValid = validatePassword(password);
+        
+        if (!isEmailValid || !isPasswordValid) {
+            setError("Please fix the validation errors before submitting.");
+            return;
+        }
+        
         setError(null);
         setLoading(true);
 
@@ -60,20 +107,39 @@ function Login() {
                 <form onSubmit={handleSubmit}>
                     <h2>Log In</h2>
                     {error && <p className="error">{error}</p>}
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+                    
+                    <div className="form-group">
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            className={emailValid === false ? 'is-invalid' : emailValid === true ? 'is-valid' : ''}
+                            required
+                        />
+                        {emailValid === false && (
+                            <div className="validation-feedback invalid-feedback">
+                                Please enter a valid email address
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="form-group">
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            className={passwordValid === false ? 'is-invalid' : passwordValid === true ? 'is-valid' : ''}
+                            required
+                        />
+                        {passwordValid === false && (
+                            <div className="validation-feedback invalid-feedback">
+                                Password is required
+                            </div>
+                        )}
+                    </div>
+                    
                     <button type="submit" disabled={loading}>
                         {loading ? "Logging in..." : "Login"}
                     </button>
@@ -83,7 +149,6 @@ function Login() {
                     </p>
                 </form>
             </div>
-
 
             <Modal
                 isOpen={modalIsOpen}
@@ -104,10 +169,7 @@ function Login() {
                 }}
             >
                 <p>{modalMessage}</p>
-               
             </Modal>
-
-
         </div>
     );
 }

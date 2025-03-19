@@ -34,8 +34,8 @@ function Jobs() {
         // Fetch jobs data
         const fetchJobs = async () => {
             try {
-                // In a real app, you would fetch this data from your API
-                // For now, we'll use mock data
+                //  fetch this data from your API
+                // For now,  use mock data
                 
                 // Mock data for demonstration
                 const mockJobs = [
@@ -105,7 +105,7 @@ function Jobs() {
 
     const handleAddJob = (e) => {
         e.preventDefault();
-        // In a real app, you would send a post request to your API
+        // In a real app,   send a post request to your API
         const newJobWithId = {
             ...newJob,
             id: jobs.length + 1,

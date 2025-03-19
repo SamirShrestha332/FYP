@@ -23,30 +23,76 @@ const db = createPool({
 
 // Signup
 app.post('/signup', async (req, res) => {
-    const { firstName, lastName, email, password, role, companyName, companyRole } = req.body;
+    console.log('Signup request received:', req.body);
+    const { firstName, lastName, email, password, role } = req.body;
+
+    // Basic validation
+    if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10); // Use bcrypt.hash
-
-        const query = 'INSERT INTO users (username, email, password, role, company_name, company_role) VALUES (?, ?, ?, ?, ?, ?)';
-        const values = [firstName + ' ' + lastName, email, hashedPassword, role, companyName, companyRole];
-
-        db.query(query, values, (err, result) => {
+        // Check if email already exists
+        const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
+        db.query(checkEmailQuery, [email], async (err, results) => {
             if (err) {
-                console.error('Signup error:', err);
+                console.error('Email check error:', err);
                 return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
             }
-            res.status(201).json({ message: 'Account created successfully!' });
+
+            if (results.length > 0) {
+                return res.status(400).json({ message: 'Email already exists. Please use a different email.' });
+            }
+
+            // If email doesn't exist, proceed with signup
+            try {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                
+                // Create username from firstName and lastName
+                const username = `${firstName} ${lastName}`;
+                
+                // Insert user with active status
+                const query = 'INSERT INTO users (username, email, password, role, status) VALUES (?, ?, ?, ?, ?)';
+                const values = [username, email, hashedPassword, role || 'seeker', 'active'];
+                
+                console.log('Executing query:', query);
+                console.log('With values:', values.map((val, i) => i === 2 ? '[HASHED PASSWORD]' : val));
+                
+                db.query(query, values, (err, result) => {
+                    if (err) {
+                        console.error('Signup error details:', err);
+                        return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
+                    }
+                    
+                    console.log('User created successfully:', result);
+                    res.status(201).json({ message: 'Account created successfully!' });
+                });
+            } catch (hashError) {
+                console.error("Password hashing error:", hashError);
+                return res.status(500).json({ message: 'Error hashing password', error: hashError.message });
+            }
         });
     } catch (error) {
-        console.error("Password hashing error:", error);
-        res.status(500).json({ message: 'Error hashing password', error: error.message });
+        console.error("Server error:", error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
 // Login
 app.post('/login', (req, res) => {
+    console.log('Login request received:', { email: req.body.email, password: '[HIDDEN]' });
     const { email, password } = req.body;
+
+    // Basic validation
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Please enter a valid email address' });
+    }
 
     const query = 'SELECT * FROM users WHERE email = ?';
     db.query(query, [email], async (err, results) => {
@@ -60,23 +106,30 @@ app.post('/login', (req, res) => {
         }
 
         const user = results[0];
-
-        const passwordMatch = await bcrypt.compare(password, user.password); // Use bcrypt.compare
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-
-        res.status(200).json({
-            message: 'Login successful!',
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                type: user.type,
-                company_name: user.company_name,
-                company_role: user.company_role
+        
+        try {
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (!passwordMatch) {
+                console.log('Password does not match for user:', email);
+                return res.status(401).json({ message: 'Invalid credentials' });
             }
-        });
+
+            console.log('User logged in successfully:', email);
+            // Return user data that matches your database structure
+            res.status(200).json({
+                message: 'Login successful!',
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role,
+                    status: user.status
+                }
+            });
+        } catch (error) {
+            console.error('Password comparison error:', error);
+            return res.status(500).json({ message: 'Authentication error', error: error.message });
+        }
     });
 });
 
