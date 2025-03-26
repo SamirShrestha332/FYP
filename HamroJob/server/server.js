@@ -198,7 +198,7 @@ app.post('/admin/login', async (req, res) => {
 });
 
 // User data route without /api prefix
-app.get('/users/me', (req, res) => {
+app.get('/users/me', (req, res) => { 
     // Extract token from header
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
