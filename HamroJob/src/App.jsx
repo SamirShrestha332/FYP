@@ -9,6 +9,11 @@ import Users from "./component/admin/Users";
 import Jobs from "./component/admin/Jobs";
 import Applications from "./component/admin/Applications";
 import Settings from "./component/admin/Settings";
+import UserProfile from "./component/UserProfile";
+import UserSettings from "./component/UserSettings";
+import UserApplications from "./component/UserApplications";
+import ProtectedRoute from "./component/ProtectedRoute";
+import JobSection from "./component/JobSection";
 import "./App.css";
 import "./component/admin/AdminStyles.css";
 
@@ -16,9 +21,58 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/signup" element={<Signup />} />
+        {/* Public Routes */}
         <Route path="/" element={<Homepage />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        
+        {/* User Routes - Protected */}
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <UserSettings />
+          </ProtectedRoute>
+        } />
+        <Route path="/applications" element={
+          <ProtectedRoute>
+            <UserApplications />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/jobs" element={
+          <ProtectedRoute>
+            <JobSection />
+          </ProtectedRoute>
+        } />
+        <Route path="/searches" element={
+          <ProtectedRoute>
+            <Homepage />
+          </ProtectedRoute>
+        } />
+        <Route path="/events" element={
+          <ProtectedRoute>
+            <Homepage />
+          </ProtectedRoute>
+        } />
+        <Route path="/saved-offers" element={
+          <ProtectedRoute>
+            <Homepage />
+          </ProtectedRoute>
+        } />
+        <Route path="/following" element={
+          <ProtectedRoute>
+            <Homepage />
+          </ProtectedRoute>
+        } />
+        <Route path="/notifications" element={
+          <ProtectedRoute>
+            <Homepage />
+          </ProtectedRoute>
+        } />
         
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />

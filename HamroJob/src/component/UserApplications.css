@@ -1,0 +1,213 @@
+.user-applications-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.applications-section {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.applications-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+}
+
+.filter-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.filter-tabs button {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+.filter-tabs button:hover {
+  color: #007bff;
+}
+
+.filter-tabs button.active {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+.applications-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.application-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.application-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.application-card.active {
+  border-left: 4px solid #28a745;
+}
+
+.application-card.rejected {
+  border-left: 4px solid #dc3545;
+}
+
+.application-card.completed {
+  border-left: 4px solid #17a2b8;
+}
+
+.company-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.company-logo img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+.application-details h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.company-name {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.application-date {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.application-status {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.application-status span {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.application-status span.active {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.application-status span.rejected {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.application-status span.completed {
+  background-color: rgba(23, 162, 184, 0.1);
+  color: #17a2b8;
+}
+
+.application-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.view-application {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.view-application:hover {
+  background-color: #0069d9;
+}
+
+.no-applications {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+}
+
+.no-applications p {
+  margin-bottom: 15px;
+}
+
+.browse-jobs-btn {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.browse-jobs-btn:hover {
+  background-color: #0069d9;
+  color: white;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+}
+
+/* Responsive design */
+@media (max-width: 991px) {
+  .user-applications-container {
+    flex-direction: column;
+  }
+  
+  .applications-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .filter-tabs button {
+    margin-bottom: 10px;
+  }
+}

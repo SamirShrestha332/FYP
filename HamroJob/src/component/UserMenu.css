@@ -1,0 +1,158 @@
+.user-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.user-menu-trigger {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  color: #ec24d2; /* Bright magenta color as shown in screenshot */
+  font-weight: 500;
+}
+
+.user-menu-trigger:hover {
+  background-color: rgba(236, 36, 210, 0.1);
+}
+
+.user-name {
+  margin-right: 5px;
+  font-weight: 500;
+}
+
+.user-menu-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  width: 300px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.user-details {
+  width: 100%;
+}
+
+.greeting {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.email {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.welcome-message {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 10px 0 20px 0;
+}
+
+.menu-options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-options li {
+  margin-bottom: 12px;
+  padding: 0;
+}
+
+.menu-options li:first-child {
+  margin-bottom: 18px;
+}
+
+.menu-options a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.menu-options li:first-child a {
+  color: #ec24d2; /* Bright magenta color for "My profile" */
+  font-weight: 500;
+}
+
+.menu-options a:hover {
+  color: #ec24d2;
+}
+
+.count {
+  background-color: #f1f1f1;
+  color: #666;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 8px;
+  background-color: #ec24d2; /* Bright magenta color as shown in screenshot */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.logout-button:hover {
+  background-color: #d214ba;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  font-size: 0.8rem;
+}
+
+.footer-links a {
+  color: #666;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .user-menu-dropdown {
+    width: 250px;
+  }
+}

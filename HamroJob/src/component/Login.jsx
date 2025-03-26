@@ -73,17 +73,29 @@ function Login() {
             });
 
             if (response.data.message === 'Login successful!') {
+                // Store user data in localStorage
                 localStorage.setItem('user', JSON.stringify(response.data.user));
+                // Set login status flag
+                localStorage.setItem('isLoggedIn', 'true');
+                // Store token if available
+                if (response.data.token) {
+                    localStorage.setItem('token', response.data.token);
+                } else {
+                    // Use a dummy token for development
+                    localStorage.setItem('token', 'sample-token-for-development');
+                }
 
                 // Set modal message and open the modal
                 setModalMessage('Login successful!');
                 setModalIsOpen(true);
 
-                // Close the modal and redirect after a delay (optional)
+                // Close the modal and redirect after a delay
                 setTimeout(() => {
                     setModalIsOpen(false);
                     navigate('/');
-                }, 2000); // Adjust delay as needed
+                    // Force a page reload to update the navigation
+                    window.location.reload();
+                }, 1500);
 
             } else {
                 setError(response.data.message || "Login failed. Invalid credentials.");
