@@ -1,0 +1,136 @@
+.otp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.otp-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.otp-card h2 {
+  color: #007bff;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.otp-card p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.otp-card .email {
+  font-weight: bold;
+  color: #333;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.otp-input {
+  width: 50px;
+  height: 60px;
+  font-size: 24px;
+  text-align: center;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: all 0.3s;
+}
+
+.otp-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.verify-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.verify-button:hover {
+  background-color: #0069d9;
+}
+
+.verify-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.timer {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.timer span {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.resend-container {
+  margin-top: 20px;
+}
+
+.resend-text {
+  color: #666;
+  margin-right: 5px;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.resend-button:disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #dc3545;
+  margin-bottom: 15px;
+}
+
+/* Animation for OTP inputs */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.otp-input.active {
+  animation: pulse 0.3s;
+  border-color: #007bff;
+}

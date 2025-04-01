@@ -112,11 +112,10 @@ function Signup() {
         navigate('/login');
     };
 
-    // Add this function or update your existing handleSubmit function
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         
-        // Validate all fields
+        // Validate form fields
         const isFirstNameValid = validateFirstName(firstName);
         const isLastNameValid = validateLastName(lastName);
         const isEmailValid = validateEmail(email);
@@ -139,8 +138,7 @@ function Signup() {
         setError(null);
         
         try {
-            // Make sure the URL matches your server endpoint
-            const response = await axios.post("http://localhost:3000/signup", {
+            const response = await axios.post('http://localhost:3000/signup', {
                 firstName,
                 lastName,
                 email,
@@ -148,21 +146,17 @@ function Signup() {
                 role
             });
             
-            console.log("Signup response:", response.data);
-            
-            if (response.status === 201) {
-                setModalMessage("Account created successfully! Redirecting to login...");
-                setModalIsOpen(true);
-                
-                // Redirect after a delay
-                setTimeout(() => {
-                    setModalIsOpen(false);
-                    navigate("/login");
-                }, 2000);
+            if (response.data) {
+                // Redirect to OTP verification page with email
+                navigate('/verify-otp', { 
+                  state: { 
+                    email 
+                  } 
+                });
             }
         } catch (error) {
-            console.error("Signup error:", error);
-            setError(error.response?.data?.message || "Something went wrong, please try again.");
+            console.error('Signup error:', error);
+            setError(error.response?.data?.message || 'An error occurred during signup');
         } finally {
             setLoading(false);
         }

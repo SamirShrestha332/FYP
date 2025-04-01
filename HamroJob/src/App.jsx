@@ -16,6 +16,7 @@ import ProtectedRoute from "./component/ProtectedRoute";
 import JobSection from "./component/JobSection";
 import "./App.css";
 import "./component/admin/AdminStyles.css";
+import OTPVerification from './component/OTPVerification';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify-otp" element={<OTPVerification />} />
         
         {/* User Routes - Protected */}
         <Route path="/profile" element={

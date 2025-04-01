@@ -3,6 +3,8 @@ import { createPool } from 'mysql2';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,61 +24,71 @@ const db = createPool({
 });
 
 // Signup
-app.post('/signup', async (req, res) => {
-    console.log('Signup request received:', req.body);
-    const { firstName, lastName, email, password, role } = req.body;
+// app.post('/signup', async (req, res) => {
+//     console.log('Signup request received:', req.body);
+//     const { firstName, lastName, email, password, role } = req.body;
 
-    // Basic validation
-    if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
+//     // Basic validation
+//     if (!firstName || !lastName || !email || !password) {
+//         return res.status(400).json({ message: 'All fields are required' });
+//     }
 
-    try {
-        // Check if email already exists
-        const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
-        db.query(checkEmailQuery, [email], async (err, results) => {
-            if (err) {
-                console.error('Email check error:', err);
-                return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
-            }
+//     try {
+//         // Check if email already exists
+//         const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
+//         db.query(checkEmailQuery, [email], async (err, results) => {
+//             if (err) {
+//                 console.error('Email check error:', err);
+//                 return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
+//             }
 
-            if (results.length > 0) {
-                return res.status(400).json({ message: 'Email already exists. Please use a different email.' });
-            }
+//             if (results.length > 0) {
+//                 return res.status(400).json({ message: 'Email already exists. Please use a different email.' });
+//             }
 
-            // If email doesn't exist, proceed with signup
-            try {
-                const hashedPassword = await bcrypt.hash(password, 10);
+//             // If email doesn't exist, proceed with signup
+//             try {
+//                 const hashedPassword = await bcrypt.hash(password, 10);
                 
-                // Create username from firstName and lastName
-                const username = `${firstName} ${lastName}`;
+//                 // Create username from firstName and lastName
+//                 const username = `${firstName} ${lastName}`;
                 
-                // Insert user with active status
-                const query = 'INSERT INTO users (username, email, password, role, status) VALUES (?, ?, ?, ?, ?)';
-                const values = [username, email, hashedPassword, role || 'seeker', 'active'];
+//                 // Insert user with active status
+//                 const query = 'INSERT INTO users (username, email, password, role, status) VALUES (?, ?, ?, ?, ?)';
+//                 const values = [username, email, hashedPassword, role || 'seeker', 'active'];
                 
-                console.log('Executing query:', query);
-                console.log('With values:', values.map((val, i) => i === 2 ? '[HASHED PASSWORD]' : val));
+//                 console.log('Executing query:', query);
+//                 console.log('With values:', values.map((val, i) => i === 2 ? '[HASHED PASSWORD]' : val));
                 
-                db.query(query, values, (err, result) => {
-                    if (err) {
-                        console.error('Signup error details:', err);
-                        return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
-                    }
+//                 db.query(query, values, async (err, result) => {
+//                     if (err) {
+//                         console.error('Signup error details:', err);
+//                         return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
+//                     }
                     
-                    console.log('User created successfully:', result);
-                    res.status(201).json({ message: 'Account created successfully!' });
-                });
-            } catch (hashError) {
-                console.error("Password hashing error:", hashError);
-                return res.status(500).json({ message: 'Error hashing password', error: hashError.message });
-            }
-        });
-    } catch (error) {
-        console.error("Server error:", error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
+//                     console.log('User created successfully:', result);
+                    
+//                     // Send welcome email
+//                     try {
+//                         await sendWelcomeEmail(email, username);
+//                         console.log('Welcome email sent to:', email);
+//                     } catch (emailError) {
+//                         console.error('Failed to send welcome email:', emailError);
+//                         // Continue with signup process even if email fails
+//                     }
+                    
+//                     res.status(201).json({ message: 'Account created successfully!' });
+//                 });
+//             } catch (hashError) {
+//                 console.error("Password hashing error:", hashError);
+//                 return res.status(500).json({ message: 'Error hashing password', error: hashError.message });
+//             }
+//         });
+//     } catch (error) {
+//         console.error("Server error:", error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// });
 
 // Login
 app.post('/login', (req, res) => {
@@ -470,6 +482,42 @@ const initializeDatabase = async () => {
           )
         `);
         
+        // Create admin_users table if it doesn't exist
+        db.query(`
+          CREATE TABLE IF NOT EXISTS admin_users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        
+        // Check if admin user exists, if not create default admin
+        db.query(`SELECT * FROM admin_users WHERE email = 'admin1@hamrojob.com'`, (err, results) => {
+            if (err) {
+                console.error('Error checking for admin user:', err);
+                return;
+            }
+            
+            // If no admin user exists, create one
+            if (results.length === 0) {
+                const defaultAdmin = {
+                    username: 'Admin',
+                    email: 'admin1@hamrojob.com',
+                    password: 'admin123' // Simple password for testing
+                };
+                
+                db.query('INSERT INTO admin_users SET ?', defaultAdmin, (err) => {
+                    if (err) {
+                        console.error('Error creating default admin user:', err);
+                    } else {
+                        console.log('Default admin user created');
+                    }
+                });
+            }
+        });
+        
         console.log('Database tables created or already exist');
     } catch (err) {
         console.error('Error initializing database:', err);
@@ -534,9 +582,403 @@ app.post('/api/jobs', (req, res) => {
     });
 });
 
+// Admin endpoint to get all users
+app.get('/admin/users', (req, res) => {
+    // Get all users from the database
+    const query = 'SELECT id, username, email, role, status, DATE_FORMAT(created_at, "%Y-%m-%d") as join_date FROM users ORDER BY id DESC';
+    
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching users:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Failed to fetch users', 
+                error: err.message 
+            });
+        }
+        
+        res.status(200).json({ 
+            success: true, 
+            users: results 
+        });
+    });
+});
+
+// Admin endpoint to change user status
+app.put('/admin/users/:id/status', (req, res) => {
+    const userId = req.params.id;
+    const { status } = req.body;
+    
+    if (!status || !['active', 'inactive'].includes(status)) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Invalid status provided' 
+        });
+    }
+    
+    const query = 'UPDATE users SET status = ? WHERE id = ?';
+    
+    db.query(query, [status, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating user status:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Failed to update user status', 
+                error: err.message 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+        
+        res.status(200).json({ 
+            success: true, 
+            message: `User status updated to ${status}` 
+        });
+    });
+});
+
 // Start the server
 app.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
 
     await initializeDatabase();
+});
+
+// Configure nodemailer for Gmail
+const emailTransporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // use SSL
+  auth: {
+    user: 'magarsamir243@gmail.com', // Change this to your Gmail address
+    pass: 'tqvoysjqkburfejy' // Add your app password here (not your regular Gmail password)
+  }
+});
+
+// Function to send welcome email
+const sendWelcomeEmail = async (userEmail, username) => {
+  try {
+    const mailOptions = {
+      from: '"HamroJob Team" <noreply@hamrojob.com>',
+      to: userEmail,
+      subject: '🎉 Welcome to HamroJob! 🎉',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #007bff;">Welcome to HamroJob! 🚀</h1>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <p>Hello ${username || 'there'},</p>
+            <p>Thank you for joining HamroJob! 🙌 We're excited to have you as part of our community.</p>
+            <p>With HamroJob, you can:</p>
+            <ul>
+              <li>✅ Find your dream job in Nepal</li>
+              <li>✅ Connect with top employers</li>
+              <li>✅ Build your professional profile</li>
+              <li>✅ Track your job applications</li>
+            </ul>
+          </div>
+          
+          <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p style="margin: 0; font-weight: bold;">Ready to get started?</p>
+            <p style="margin-top: 10px;">Complete your profile to increase your chances of getting noticed by employers!</p>
+            <div style="text-align: center; margin-top: 15px;">
+              <a href="http://localhost:5174/profile" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Complete Your Profile</a>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <p>If you have any questions, feel free to contact our support team at support@hamrojob.com</p>
+            <p>© ${new Date().getFullYear()} HamroJob. All rights reserved.</p>
+          </div>
+        </div>
+      `
+    };
+
+    const info = await emailTransporter.sendMail(mailOptions);
+    console.log('Welcome email sent successfully:', info.messageId);
+    return true;
+  } catch (error) {
+    console.error('Error sending welcome email:', error);
+    return false;
+  }
+};
+
+// Create a Map to store OTP data temporarily
+const otpStore = new Map();
+
+// Generate a random 6-digit OTP
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Use the existing emailTransporter instead of creating a new one
+// const transporter = nodemailer.createTransport({...});
+
+// Modify the signup endpoint for OTP
+app.post('/signup', async (req, res) => {
+  try {
+    const { firstName, lastName, email, password, role } = req.body;
+    
+    // Check if user already exists
+    const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
+    db.query(checkEmailQuery, [email], async (err, results) => {
+      if (err) {
+        console.error('Email check error:', err);
+        return res.status(500).json({ message: 'Something went wrong, please try again.', error: err.message });
+      }
+
+      if (results.length > 0) {
+        return res.status(400).json({ message: 'Email already exists. Please use a different email.' });
+      }
+      
+      // Generate OTP
+      const otp = generateOTP();
+      
+      // Store OTP with expiration (10 minutes)
+      const otpData = {
+        otp,
+        email,
+        firstName,
+        lastName,
+        password,
+        role: role || 'seeker',
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+      };
+      
+      otpStore.set(email, otpData);
+      
+      // Create username from firstName and lastName
+      const username = `${firstName} ${lastName}`;
+      
+      // Send OTP email
+      const mailOptions = {
+        from: '"HamroJob Team" <noreply@hamrojob.com>',
+        to: email,
+        subject: '🔐 Your HamroJob Verification Code',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h1 style="color: #007bff;">Verify Your Email</h1>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <p>Hello ${username},</p>
+              <p>Thank you for signing up with HamroJob! To complete your registration, please enter the verification code below:</p>
+            </div>
+            
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+              <h2 style="letter-spacing: 5px; font-size: 32px; margin: 10px 0; color: #007bff;">${otp}</h2>
+              <p style="margin: 0; color: #6c757d; font-size: 14px;">This code will expire in 10 minutes</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <p>If you didn't request this code, you can safely ignore this email.</p>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center; color: #6c757d; font-size: 14px;">
+              <p>© ${new Date().getFullYear()} HamroJob. All rights reserved.</p>
+            </div>
+          </div>
+        `
+      };
+
+      try {
+        console.log('Attempting to send OTP email to:', email);
+        console.log('OTP code:', otp);
+        console.log('Mail options:', JSON.stringify(mailOptions, null, 2));
+        
+        await emailTransporter.sendMail(mailOptions);
+        console.log('OTP email sent successfully to:', email);
+        
+        res.status(200).json({ 
+          message: 'Verification code sent to your email',
+          email
+        });
+      } catch (emailError) {
+        console.error('Failed to send OTP email:', emailError);
+        res.status(500).json({ message: 'Failed to send verification email', error: emailError.message });
+      }
+    });
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Endpoint to verify OTP
+app.post('/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    
+    // Get stored OTP data
+    const otpData = otpStore.get(email);
+    
+    // Check if OTP exists and is valid
+    if (!otpData) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Verification code expired or invalid. Please request a new code.' 
+      });
+    }
+    
+    // Check if OTP has expired
+    if (new Date() > otpData.expiresAt) {
+      otpStore.delete(email);
+      return res.status(400).json({ 
+        success: false,
+        message: 'Verification code has expired. Please request a new code.' 
+      });
+    }
+    
+    // Check if OTP matches
+    if (otpData.otp !== otp) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid verification code. Please try again.' 
+      });
+    }
+    
+    // OTP is valid, create the user
+    const { firstName, lastName, password, role } = otpData;
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Create username from firstName and lastName
+    const username = `${firstName} ${lastName}`;
+    
+    // Insert user into database
+    const query = 'INSERT INTO users (username, email, password, role, status) VALUES (?, ?, ?, ?, ?)';
+    const values = [username, email, hashedPassword, role, 'active'];
+    
+    db.query(query, values, async (err, result) => {
+      if (err) {
+        console.error('User creation error:', err);
+        return res.status(500).json({ 
+          success: false,
+          message: 'Error creating user account', 
+          error: err.message 
+        });
+      }
+      
+      // Send welcome email
+      try {
+        await sendWelcomeEmail(email, username);
+      } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError);
+        // Continue with signup process even if welcome email fails
+      }
+      
+      // Remove OTP data
+      otpStore.delete(email);
+      
+      res.status(200).json({ 
+        success: true,
+        message: 'Email verified successfully! You can now log in.' 
+      });
+    });
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error', 
+      error: error.message 
+    });
+  }
+});
+
+// Endpoint to resend OTP
+app.post('/resend-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Get stored OTP data
+    const otpData = otpStore.get(email);
+    
+    if (!otpData) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid email or session expired. Please sign up again.' 
+      });
+    }
+    
+    // Generate new OTP
+    const otp = generateOTP();
+    
+    // Update OTP data
+    otpData.otp = otp;
+    otpData.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    
+    otpStore.set(email, otpData);
+    
+    // Create username from firstName and lastName
+    const username = `${otpData.firstName} ${otpData.lastName}`;
+    
+    // Send OTP email
+    const mailOptions = {
+      from: '"HamroJob Team" <noreply@hamrojob.com>',
+      to: email,
+      subject: '🔐 Your New HamroJob Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #007bff;">Your New Verification Code</h1>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <p>Hello ${username},</p>
+            <p>Here is your new verification code to complete your registration:</p>
+          </div>
+          
+          <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+            <h2 style="letter-spacing: 5px; font-size: 32px; margin: 10px 0; color: #007bff;">${otp}</h2>
+            <p style="margin: 0; color: #6c757d; font-size: 14px;">This code will expire in 10 minutes</p>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <p>If you didn't request this code, you can safely ignore this email.</p>
+          </div>
+          
+          <div style="margin-top: 30px; text-align: center; color: #6c757d; font-size: 14px;">
+            <p>© ${new Date().getFullYear()} HamroJob. All rights reserved.</p>
+          </div>
+        </div>
+      `
+    };
+    
+    try {
+      console.log('Attempting to send OTP email to:', email);
+      console.log('OTP code:', otp);
+      console.log('Mail options:', JSON.stringify(mailOptions, null, 2));
+      
+      await emailTransporter.sendMail(mailOptions);
+      console.log('OTP email sent successfully to:', email);
+      
+      res.status(200).json({ 
+        success: true,
+        message: 'New verification code sent to your email'
+      });
+    } catch (emailError) {
+      console.error('Failed to send OTP email:', emailError);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to send verification email', 
+        error: emailError.message 
+      });
+    }
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error', 
+      error: error.message 
+    });
+  }
 });
