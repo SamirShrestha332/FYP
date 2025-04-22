@@ -32,19 +32,39 @@ function UserApplications() {
         
         // Then fetch applications from server
         try {
-          const response = await fetch(`http://localhost:5000/api/applications/user/${userData.id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
+          const response = await axios.get(
+            `http://localhost:5000/api/applications/user/${userData.id}`,
+            { 
+              headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              } 
             }
-          });
+          );
           
-          if (!response.ok) {
-            throw new Error('Failed to fetch applications');
+          console.log('Applications data:', response.data); // Debug log
+          
+          if (response.data && response.data.applications) {
+            // Process the applications data to ensure it has all required fields
+            const processedApplications = response.data.applications.map(app => {
+              console.log('Individual application:', app); // Debug individual app structure
+              
+              return {
+                ...app,
+                companyName: app.company || app.job?.company || 'Company Name',
+                jobTitle: app.job_title || app.job?.title || 'Job Title',
+                jobType: app.job_type || app.job?.jobType || 'Full-time',
+                formattedDate: app.created_at ? new Date(app.created_at).toLocaleDateString() : 'Pending',
+                formattedTime: app.created_at ? new Date(app.created_at).toLocaleTimeString() : 'N/A',
+                status: app.status || 'pending'
+              };
+            });
+            
+            console.log('Processed applications:', processedApplications); // Debug processed data
+            setApplications(processedApplications);
+          } else {
+            setApplications([]);
           }
-          
-          const data = await response.json();
-          console.log('Applications data:', data); // Debug log
-          setApplications(data.applications || []);
         } catch (fetchError) {
           console.error('Error fetching applications:', fetchError);
           setError('Failed to fetch your applications. Please try again later.');
@@ -70,7 +90,12 @@ function UserApplications() {
       return applications;
     }
     
-    return applications.filter(app => app.status.toLowerCase() === activeFilter);
+    // Map 'active' filter to 'pending' status
+    if (activeFilter === 'active') {
+      return applications.filter(app => app.status === 'pending');
+    }
+    
+    return applications.filter(app => app.status.toLowerCase() === activeFilter.toLowerCase());
   };
 
   const handleLogout = () => {
@@ -176,21 +201,23 @@ function UserApplications() {
                 {getFilteredApplications().map((app) => (
                   <div key={app.id} className={`application-card ${app.status.toLowerCase()}`}>
                     <div className="company-logo">
-                      <img src={app.companyLogo || "/src/assets/Companylogo.png"} alt={app.companyName} />
+                      <img src="/src/assets/Companylogo.png" alt="Company Logo" />
                     </div>
+                    // In the render section where you display the application card
                     <div className="application-details">
-                      <h3>{app.jobTitle}</h3>
-                      <p className="company-name">{app.companyName}</p>
-                      <p className="application-date">Applied on: {app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : 'Pending'}</p>
+                      <h3 className="company-name">{app.companyName}</h3>
+                      <p className="job-title">{app.jobTitle}</p>
+                      <div className="job-type-badge">
+                        {app.jobType}
+                      </div>
+                      <p className="application-date">Applied on: {app.formattedDate}</p>
+                      <p className="application-time">Time: {app.formattedTime}</p>
                       <p className="application-status">Status: <span className={app.status.toLowerCase()}>{app.status}</span></p>
                     </div>
                     <div className="application-actions">
-                      <button 
-                        className="view-application"
-                        onClick={() => navigate(`/application-details/${app.id}`)}
-                      >
+                      <Link to={`/application-details/${app.id}`} className="view-application">
                         View Application
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -205,40 +232,6 @@ function UserApplications() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="homepage-footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <h3>Our Locations</h3>
-            <ul>
-              <li>Kathmandu - Main Office</li>
-              <li>Pokhara</li>
-              <li>Biratnagar</li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h3>Contact Us</h3>
-            <ul>
-              <li>Email: info@hamrojob.com</li>
-              <li>Phone: +977-1-4123456</li>
-              <li>Address: Kathmandu, Nepal</li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h3>Follow Us</h3>
-            <div className="social-icons">
-              <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
-              <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
-              <a href="#"><ion-icon name="logo-linkedin"></ion-icon></a>
-              <a href="#"><ion-icon name="logo-instagram"></ion-icon></a>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>&copy; 2025 HamroJob. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }

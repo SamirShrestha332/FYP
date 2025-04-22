@@ -98,62 +98,92 @@
 }
 
 .company-name {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
 }
 
-.application-date {
-  font-size: 12px;
-  color: #999;
+.job-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #444;
   margin-bottom: 10px;
 }
 
-.application-status {
-  font-size: 14px;
+.job-type-badge {
+  display: inline-block;
+  background-color: #e6f2ff;
+  color: #0066cc;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 500;
   margin-bottom: 15px;
 }
 
+.application-date, .application-time {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.application-status {
+  font-size: 16px;
+  margin-top: 10px;
+}
+
 .application-status span {
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
-.application-status span.active {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: #28a745;
+.application-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
-.application-status span.rejected {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+.company-logo {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 15px;
 }
 
-.application-status span.completed {
-  background-color: rgba(23, 162, 184, 0.1);
-  color: #17a2b8;
+.company-logo img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  padding: 5px;
 }
 
 .application-actions {
-  display: flex;
-  justify-content: center;
+  margin-top: 20px;
 }
 
 .view-application {
+  display: inline-block;
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 20px;
+  border-radius: 5px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.3s;
+  text-decoration: none;
+  text-align: center;
 }
 
 .view-application:hover {
-  background-color: #0069d9;
+  background-color: #0056b3;
 }
 
 .no-applications {
@@ -210,4 +240,22 @@
   .filter-tabs button {
     margin-bottom: 10px;
   }
+}
+
+
+.job-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.job-type {
+  font-size: 14px;
+  color: #0066cc;
+  background-color: rgba(0, 102, 204, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 10px;
 }

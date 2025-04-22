@@ -36,6 +36,7 @@ import Esewapayment from './component/recruiter/Payment/EsewaPayment.jsx';
 import ProtectedJobRoute from './component/recruiter/ProtectedJobRoute';
 
 import PaymentSuccess from './component/recruiter/Payment/PaymentSuccess';
+import ApplicationDetails from './component/ApplicationDetails';
 
 function App() {
   return (
@@ -54,6 +55,18 @@ function App() {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<TermsOfService />} />
         <Route path="/help" element={<TermsOfService />} />
+        
+        {/* Application details routes - both formats */}
+        <Route path="/application/:applicationId" element={
+          <ProtectedRoute>
+            <ApplicationDetails />
+          </ProtectedRoute>
+        } />
+        <Route path="/application-details/:applicationId" element={
+          <ProtectedRoute>
+            <ApplicationDetails />
+          </ProtectedRoute>
+        } />
         
         {/* Recruiter Routes */}
         <Route path="/recruiter/payment" element={

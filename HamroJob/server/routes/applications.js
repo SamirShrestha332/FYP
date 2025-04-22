@@ -6,6 +6,7 @@ import { dirname } from 'path';
 import { db } from '../config/db.js';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -268,32 +269,88 @@ router.get('/job/:jobId', (req, res) => {
 });
 
 // GET endpoint to fetch applications for a user
-router.get('/user/:userId', (req, res) => {
+router.get('/user/:userId', authenticateToken, async (req, res) => {
   const { userId } = req.params;
   
-  const query = `
-    SELECT a.*, j.title as job_title, j.company, j.location, j.job_type
-    FROM applications a
-    JOIN jobs j ON a.job_id = j.id
-    WHERE a.user_id = ?
-    ORDER BY a.created_at DESC
-  `;
+  try {
+    // Join applications with jobs to get company information
+    const [applications] = await db.query(`
+      SELECT a.*, j.title as job_title, j.company as company_name, j.location as job_location, 
+             j.job_type, j.created_at as job_posted_date
+      FROM applications a
+      JOIN jobs j ON a.job_id = j.id
+      WHERE a.user_id = ?
+      ORDER BY a.created_at DESC
+    `, [userId]);
+    
+    // Process applications to include job details
+    const processedApplications = applications.map(app => {
+      return {
+        ...app,
+        job: {
+          id: app.job_id,
+          title: app.job_title,
+          company: app.company_name,
+          location: app.job_location,
+          jobType: app.job_type
+        }
+      };
+    });
+    
+    res.json({ applications: processedApplications });
+  } catch (error) {
+    console.error('Error fetching applications:', error);
+    res.status(500).json({ message: 'Failed to fetch applications' });
+  }
+});
+
+// Get a specific application by ID
+router.get('/:applicationId', authenticateToken, async (req, res) => {
+  const { applicationId } = req.params;
   
-  db.query(query, [userId], (err, results) => {
-    if (err) {
-      console.error('Error fetching user applications:', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to fetch applications',
-        error: err.message
-      });
+  try {
+    // Join with jobs table to get job details including job type
+    const [applications] = await db.query(`
+      SELECT a.*, j.title, j.company, j.location, j.description, j.requirements, 
+             j.job_type, j.salary_range
+      FROM applications a
+      JOIN jobs j ON a.job_id = j.id
+      WHERE a.id = ?
+    `, [applicationId]);
+    
+    if (applications.length === 0) {
+      return res.status(404).json({ message: 'Application not found' });
     }
     
-    res.status(200).json({
-      success: true,
-      applications: results
-    });
-  });
+    const application = applications[0];
+    
+    // Format the application data
+    const formattedApplication = {
+      id: application.id,
+      status: application.status,
+      appliedDate: application.created_at,
+      updatedDate: application.updated_at,
+      resumeUrl: application.resume,
+      resumeFilename: application.resume ? application.resume.split('/').pop() : null,
+      videoUrl: application.video_url,
+      coverLetter: application.cover_letter,
+      job: {
+        id: application.job_id,
+        title: application.title,
+        company: application.company,
+        location: application.location,
+        description: application.description,
+        requirements: application.requirements,
+        jobType: application.job_type,
+        salaryRange: application.salary_range
+      }
+    };
+    
+    res.json({ application: formattedApplication });
+  } catch (error) {
+    console.error('Error fetching application details:', error);
+    res.status(500).json({ message: 'Failed to fetch application details' });
+  }
 });
 
 // GET endpoint to fetch applications for a recruiter's jobs

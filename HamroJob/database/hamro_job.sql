@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 22, 2025 at 05:25 AM
+-- Generation Time: Apr 22, 2025 at 08:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,11 +71,8 @@ CREATE TABLE `applications` (
 --
 
 INSERT INTO `applications` (`id`, `job_id`, `user_id`, `resume`, `resume_public_id`, `cover_letter`, `status`, `created_at`, `updated_at`, `video_url`) VALUES
-(1, 16, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1744129976/CV_resume/resume_19_1744129976800.pdf', NULL, 'lajsld;kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', 'pending', '2025-04-08 16:32:59', NULL, NULL),
-(2, 15, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1744130625/CV_resume/resume_19_1744130627138.docx', NULL, 'gfhgfgfgfhgfhgfgfhgffgfhgfghfghfghhgfghfghfghfhghhgfhgf', 'pending', '2025-04-08 16:43:48', NULL, NULL),
-(3, 22, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1744514460/CV_resume/resume_19_1744514459735.docx', NULL, 'asdfasafasfsaasdfasafasfsaasdfasafasfsaasdfasafasfsaasdfasafasfsaasdfasafasfsa', 'pending', '2025-04-13 03:21:01', NULL, NULL),
-(8, 17, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1744517441/CV_resume/resume_19_1744517440261.docx', NULL, 'asdfasdfsadfffffffffffffffffffffffffffffffffffffffffffffffffff', 'pending', '2025-04-13 04:10:42', NULL, NULL),
-(9, 18, 22, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1744520696/CV_resume/resume_22_1744520694867.docx', NULL, 'sfasl;ajfddddddddkasldfjaslkfjlasjjllalskjfljsalfkjalkfj', 'pending', '2025-04-13 05:04:57', NULL, NULL);
+(10, 23, 19, 'https://res.cloudinary.com/dfplmkziu/image/upload/v1745307845/CV_resume/resume_19_1745307843528.pdf', NULL, 'asdfasdfsdfs', 'pending', '2025-04-22 07:44:22', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745307847/video_resumes/video_19_1745307847838.mp4'),
+(14, 15, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745340927/CV_resume/resume_19_1745340928561.docx', NULL, 'gfhgfghfhgfhfhf', 'pending', '2025-04-22 16:55:46', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745340931/video_resumes/video_19_1745340930110.mp4');
 
 -- --------------------------------------------------------
 
@@ -111,7 +108,8 @@ INSERT INTO `jobs` (`id`, `title`, `company`, `location`, `description`, `requir
 (19, 'Software developer ', 'Hamro job', 'Software developer ', 'Software developer Software developer Software developer ', 'Software developer Software developer Software developer Software developer ', 'closed', 1, 'full-time', '2025-04-11 16:20:55', '2025-04-12 04:28:18', 'no', 1),
 (20, 'salaksjahsd', 'Hamro jobas', 'adasdgasgs', 'Hamro HaHamro jobasmro jobasHamro jobasHamro jobasjobasHamro jobas', 'Hamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobas', 'closed', 1, 'full-time', '2025-04-11 16:35:31', '2025-04-12 05:03:03', 'no', 1),
 (21, 'Hotel manager ', 'Saliman Hotel', 'Putalisadak, Nepal', 'We are seeking a dedicated and experienced Hotel Manager to lead and oversee the daily operations of our hotel. The ideal candidate should be passionate about hospitality, possess excellent leadership skills, and ensure the highest standards of guest satisfaction. As a Hotel Manager, you will be responsible for managing staff, budgeting, marketing, and ensuring smooth and efficient operations of the hotel.\n\n', 'We are seeking a dedicated and experienced Hotel Manager to lead and oversee the daily operations of our hotel. The ideal candidate should be passionate about hospitality, possess excellent leadership skills, and ensure the highest standards of guest satisfaction. As a Hotel Manager, you will be responsible for managing staff, budgeting, marketing, and ensuring smooth and efficient operations of the hotel.\n\n', 'active', 1, 'full-time', '2025-04-11 16:43:50', '2025-04-12 05:41:28', 'yes', 1),
-(22, 'Frontend developer', 'Compa', 'Frontend developer', 'Frontend developerFrontend developerFrontend developerFrontend developer', 'Frontend developerFrontend developerFronte', 'active', 2, 'part-time', '2025-04-12 11:46:23', '2025-04-12 11:49:27', 'yes', 1);
+(22, 'Frontend developer', 'Compa', 'Frontend developer', 'Frontend developerFrontend developerFrontend developerFrontend developer', 'Frontend developerFrontend developerFronte', 'active', 2, 'part-time', '2025-04-12 11:46:23', '2025-04-12 11:49:27', 'yes', 1),
+(23, 'Designer ', 'DOt net Designer ', 'Bhaktapur,Kathmandu', 'We are seeking a creative and detail-oriented Designer to join our team. The ideal candidate should have a strong eye for aesthetics and be passionate about creating visually appealing and user-friendly designs. You will work closely with our marketing, development, and product teams to bring ideas to life through design.', 'Proven experience as a designer (portfolio required)\n\nProficiency in tools like Adobe Creative Suite (Photoshop, Illustrator, XD, etc.), Figma, or Sketch\n\nStrong understanding of color theory, typography, and layout design\n\nGood communication and collaboration skills\n\nAbility to work independently and manage multiple projects', 'active', 2, 'job', '2025-04-22 07:41:23', '2025-04-22 07:43:47', 'yes', 1);
 
 -- --------------------------------------------------------
 
@@ -343,13 +341,13 @@ ALTER TABLE `admin_users`
 -- AUTO_INCREMENT for table `applications`
 --
 ALTER TABLE `applications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `payments`
