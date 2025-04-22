@@ -18,14 +18,15 @@ const ProtectedRoute = ({ children }) => {
           return;
         }
         
-        // Set authentication to true based on localStorage first to prevent redirecting
+        // Set authentication
+        // to true based on localStorage first to prevent redirecting
         // This helps avoid the login loop
         setIsAuthenticated(true);
         setLoading(false);
         
         // Then verify with the backend (but don't wait for this to complete)
         try {
-          const response = await axios.get('http://localhost:3000/api/users/verify', {
+          const response = await axios.get('http://localhost:5000/api/users/verify', {
             headers: { Authorization: `Bearer ${token}` }
           });
           
@@ -62,5 +63,6 @@ const ProtectedRoute = ({ children }) => {
 
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
+
 
 export default ProtectedRoute;

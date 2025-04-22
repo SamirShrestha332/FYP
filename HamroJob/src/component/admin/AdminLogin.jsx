@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
 import Modal from 'react-modal';
 Modal.setAppElement('#root');
@@ -81,7 +81,7 @@ function AdminLogin() {
         setError(null);
 
         try {
-            const response = await axios.post("http://localhost:3000/admin/login", {
+            const response = await axios.post("http://localhost:5000/admin/login", {
                 email,
                 password
             });
@@ -106,7 +106,7 @@ function AdminLogin() {
                 setTimeout(() => {
                     console.log('Forcing navigation to dashboard...');
                     window.location.href = '/admin/dashboard';
-                }, 1500);
+                }, 4000);
             } else {
                 setError(response.data.message || "Login failed. Invalid credentials.");
             }
@@ -131,91 +131,67 @@ function AdminLogin() {
     };
 
     return (
-        <div className="admin-login-container">
-            <form className="admin-login-form" onSubmit={handleSubmit}>
-                <h2>Admin Login</h2>
-                
-                {error && <div className="error-message">{error}</div>}
-                
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={handleEmailChange}
-                        className={emailValid === false ? 'is-invalid' : emailValid === true ? 'is-valid' : ''}
-                        placeholder="Enter admin email"
-                        autoComplete="email"
-                        required
-                    />
-                    {emailValid === false && (
-                        <div className="validation-feedback invalid-feedback">
-                            Please enter a valid email address
-                        </div>
-                    )}
+        <div className="admin-auth-container">
+            <div className="admin-auth-card">
+                <div className="admin-auth-header">
+                    <h2>Admin Login</h2>
+                    <p>Sign in to access your admin dashboard</p>
                 </div>
                 
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                        className={passwordValid === false ? 'is-invalid' : passwordValid === true ? 'is-valid' : ''}
-                        placeholder="Enter admin password"
-                        autoComplete="current-password"
-                        required
-                    />
-                    {passwordValid === false && (
-                        <div className="validation-feedback invalid-feedback">
-                            Password must be at least 6 characters
-                        </div>
-                    )}
-                </div>
+                {error && (
+                    <div className="admin-error-message">
+                        {error}
+                    </div>
+                )}
                 
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
-
+                <form className="admin-auth-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="email">Email Address</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            className={emailValid === false ? 'invalid' : ''}
+                            placeholder="Enter your email"
+                        />
+                        {emailValid === false && <div className="validation-error">Please enter a valid email address</div>}
+                    </div>
+                    
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            className={passwordValid === false ? 'invalid' : ''}
+                            placeholder="Enter your password"
+                        />
+                        {passwordValid === false && <div className="validation-error">Password must be at least 6 characters</div>}
+                    </div>
+                    
+                    <div className="admin-forgot-password">
+                        <Link to="/admin/forgot-password">Forgot Password?</Link>
+                    </div>
+                    
+                    <button type="submit" className="submit-btn" disabled={loading}>
+                        {loading ? 'Signing in...' : 'Sign In'}
+                    </button>
+                </form>
+                
+                
+            </div>
+            
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
-                style={{
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        padding: '20px',
-                        borderRadius: '5px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        width: '300px'
-                    }
-                }}
+                contentLabel="Login Success"
+                className="admin-modal-content"
+                overlayClassName="admin-modal"
             >
-                <div style={{ textAlign: 'center' }}>
-                    <p>{modalMessage}</p>
-                    <button 
-                        onClick={handleManualRedirect}
-                        style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            marginTop: '10px'
-                        }}
-                    >
-                        Go to Dashboard
-                    </button>
-                </div>
+                <div className="admin-modal-message">{modalMessage}</div>
+                <button onClick={handleManualRedirect} className="admin-modal-button">Go to Dashboard</button>
             </Modal>
         </div>
     );

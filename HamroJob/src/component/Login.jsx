@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 import Modal from 'react-modal'; 
 Modal.setAppElement('#root'); 
@@ -11,8 +11,8 @@ function Login() {
     const navigate = useNavigate();
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [modalIsOpen, setModalIsOpen] = useState(false); // Modal state
-    const [modalMessage, setModalMessage] = useState(''); // Modal message
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
     
     // Add validation states
     const [emailValid, setEmailValid] = useState(null);
@@ -67,7 +67,7 @@ function Login() {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:3000/login", {
+            const response = await axios.post("http://localhost:5000/login", {
                 email,
                 password
             });
@@ -116,71 +116,63 @@ function Login() {
     return (
         <div className="container_login">
             <div className="login-container">
+                <div className="login-header">
+                    <h2>User Login</h2>
+                    <p>Sign in to access your account</p>
+                </div>
+                
+                {error && <div className="error-message">{error}</div>}
+                
                 <form onSubmit={handleSubmit}>
-                    <h2>Log In</h2>
-                    {error && <p className="error">{error}</p>}
-                    
                     <div className="form-group">
+                        <label htmlFor="email">Email Address</label>
                         <input
                             type="email"
-                            placeholder="Email"
+                            id="email"
                             value={email}
                             onChange={handleEmailChange}
-                            className={emailValid === false ? 'is-invalid' : emailValid === true ? 'is-valid' : ''}
-                            required
+                            className={emailValid === false ? 'invalid' : ''}
+                            placeholder="Enter your email"
                         />
-                        {emailValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                Please enter a valid email address
-                            </div>
-                        )}
+                        {emailValid === false && <div className="validation-error">Please enter a valid email address</div>}
                     </div>
                     
                     <div className="form-group">
+                        <label htmlFor="password">Password</label>
                         <input
                             type="password"
-                            placeholder="Password"
+                            id="password"
                             value={password}
                             onChange={handlePasswordChange}
-                            className={passwordValid === false ? 'is-invalid' : passwordValid === true ? 'is-valid' : ''}
-                            required
+                            className={passwordValid === false ? 'invalid' : ''}
+                            placeholder="Enter your password"
                         />
-                        {passwordValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                Password is required
-                            </div>
-                        )}
+                        {passwordValid === false && <div className="validation-error">Password is required</div>}
                     </div>
                     
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
+                    <div className="forgot-password">
+                        <Link to="/forgot-password">Forgot Password?</Link>
+                    </div>
+                    
+                    <button type="submit" className="submit-btn" disabled={loading}>
+                        {loading ? 'Signing in...' : 'Sign In'}
                     </button>
-
-                    <p className="signup-link">
-                        Don't have an account? <a href="/signup">Signup</a>
-                    </p>
                 </form>
+                
+                <div className="login-footer">
+                    Don't have an account? <Link to="/signup">Sign up</Link>
+                </div>
             </div>
-
+            
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
-                style={{ // You can customize the modal's style here
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        padding: '20px',
-                        borderRadius: '5px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                    }
-                }}
+                contentLabel="Login Success"
+                className="modal-content"
+                overlayClassName="modal-overlay"
             >
-                <p>{modalMessage}</p>
+                <div className="modal-message">{modalMessage}</div>
+                <button onClick={closeModal} className="modal-button">Close</button>
             </Modal>
         </div>
     );

@@ -200,7 +200,6 @@
         font-size: 11px;
     }
 }
-
 @media (max-width: 768px) {
     .sidebar-toggle {
         display: block;

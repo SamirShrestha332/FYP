@@ -101,7 +101,7 @@ function UserSettings() {
       // Call the API to change password using the updated endpoint without /api prefix
       // Include the user email for identification
       const response = await axios.post(
-        'http://localhost:3000/users/change-password',
+        'http://localhost:5000/users/change-password',
         {
           currentPassword,
           newPassword,

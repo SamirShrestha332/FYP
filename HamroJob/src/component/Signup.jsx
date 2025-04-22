@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Signup.css";
 import Modal from 'react-modal';
 Modal.setAppElement('#root');
@@ -138,14 +138,13 @@ function Signup() {
         setError(null);
         
         try {
-            const response = await axios.post('http://localhost:3000/signup', {
+            const response = await axios.post('http://localhost:5000/signup', {
                 firstName,
                 lastName,
                 email,
                 password,
                 role
-            });
-            
+            });            
             if (response.data) {
                 // Redirect to OTP verification page with email
                 navigate('/verify-otp', { 
@@ -163,138 +162,106 @@ function Signup() {
     };
 
     return (
-        <div className="container_signup">
-            <div className="signup-container">
-                <form onSubmit={handleSubmit}>
-                    <h2>Sign up</h2>
-                    {error && <p className="error-message">{error}</p>}
-                    
-                    <div className="form-group">
-                        <input
-                            type="text"
-                            placeholder="First Name"
-                            value={firstName}
-                            onChange={handleFirstNameChange}
-                            className={firstNameValid === false ? 'is-invalid' : firstNameValid === true ? 'is-valid' : ''}
-                            required
-                        />
-                        {firstNameValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                First name is required
-                            </div>
-                        )}
+        <div className="user-auth-container">
+            <div className="user-auth-card">
+                <div className="user-auth-header">
+                    <h2>User Signup</h2>
+                    <p>Create your account to find jobs</p>
+                </div>
+                
+                {error && (
+                    <div className="user-error-message">
+                        {error}
+                    </div>
+                )}
+                
+                <form className="user-auth-form" onSubmit={handleSubmit}>
+                    <div className="user-form-row">
+                        <div className="form-group">
+                            <label htmlFor="firstName">First Name</label>
+                            <input
+                                type="text"
+                                id="firstName"
+                                value={firstName}
+                                onChange={handleFirstNameChange}
+                                className={firstNameValid === false ? 'invalid' : ''}
+                                placeholder="Enter your first name"
+                            />
+                            {firstNameValid === false && <div className="validation-error">First name is required</div>}
+                        </div>
+                        
+                        <div className="form-group">
+                            <label htmlFor="lastName">Last Name</label>
+                            <input
+                                type="text"
+                                id="lastName"
+                                value={lastName}
+                                onChange={handleLastNameChange}
+                                className={lastNameValid === false ? 'invalid' : ''}
+                                placeholder="Enter your last name"
+                            />
+                            {lastNameValid === false && <div className="validation-error">Last name is required</div>}
+                        </div>
                     </div>
                     
                     <div className="form-group">
-                        <input
-                            type="text"
-                            placeholder="Last Name"
-                            value={lastName}
-                            onChange={handleLastNameChange}
-                            className={lastNameValid === false ? 'is-invalid' : lastNameValid === true ? 'is-valid' : ''}
-                            required
-                        />
-                        {lastNameValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                Last name is required
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="form-group">
+                        <label htmlFor="email">Email Address</label>
                         <input
                             type="email"
-                            placeholder="Email"
+                            id="email"
                             value={email}
                             onChange={handleEmailChange}
-                            className={emailValid === false ? 'is-invalid' : emailValid === true ? 'is-valid' : ''}
-                            required
+                            className={emailValid === false ? 'invalid' : ''}
+                            placeholder="Enter your email"
                         />
-                        {emailValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                Please enter a valid email address
-                            </div>
-                        )}
+                        {emailValid === false && <div className="validation-error">Please enter a valid email address</div>}
                     </div>
                     
                     <div className="form-group">
+                        <label htmlFor="password">Password</label>
                         <input
                             type="password"
-                            placeholder="Password"
+                            id="password"
                             value={password}
                             onChange={handlePasswordChange}
-                            className={passwordValid === false ? 'is-invalid' : passwordValid === true ? 'is-valid' : ''}
-                            required
+                            className={passwordValid === false ? 'invalid' : ''}
+                            placeholder="Create a password"
                         />
-                        {passwordValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                Password must be at least 6 characters
-                            </div>
-                        )}
+                        {passwordValid === false && <div className="validation-error">Password must be at least 6 characters</div>}
                     </div>
                     
                     <div className="form-group">
+                        <label htmlFor="confirmPassword">Confirm Password</label>
                         <input
                             type="password"
-                            placeholder="Confirm Password"
+                            id="confirmPassword"
                             value={confirmPassword}
                             onChange={handleConfirmPasswordChange}
-                            className={confirmPasswordValid === false ? 'is-invalid' : confirmPasswordValid === true ? 'is-valid' : ''}
-                            required
+                            className={confirmPasswordValid === false ? 'invalid' : ''}
+                            placeholder="Confirm your password"
                         />
-                        {confirmPasswordValid === false && (
-                            <div className="validation-feedback invalid-feedback">
-                                Passwords do not match
-                            </div>
-                        )}
+                        {confirmPasswordValid === false && <div className="validation-error">Passwords do not match</div>}
                     </div>
                     
-                    <input type="hidden" value={"seeker"} name="role" />
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Signing up..." : "Sign up"}
+                    <button type="submit" className="submit-btn" disabled={loading}>
+                        {loading ? 'Creating Account...' : 'Create Account'}
                     </button>
-                    <p className="login-link">
-                        Already have an account? <a href="/login">Login</a>
-                    </p>
                 </form>
+                
+                <div className="user-auth-footer">
+                    Already have an account? <Link to="/login">Sign in</Link>
+                </div>
             </div>
-
+            
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
-                style={{
-                    content: {
-                        top: '50%',
-                        left: '50%',
-                        right: 'auto',
-                        bottom: 'auto',
-                        marginRight: '-50%',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: '#fff',
-                        padding: '20px',
-                        borderRadius: '5px',
-                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                        width: '300px'
-                    }
-                }}
+                contentLabel="Signup Success"
+                className="user-modal-content"
+                overlayClassName="user-modal"
             >
-                <div style={{ textAlign: 'center' }}>
-                    <p>{modalMessage}</p>
-                    <button 
-                        onClick={closeModal}
-                        style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            marginTop: '10px'
-                        }}
-                    >
-                        Go to Login
-                    </button>
-                </div>
+                <div className="user-modal-message">{modalMessage}</div>
+                <button onClick={closeModal} className="user-modal-button">Login Now</button>
             </Modal>
         </div>
     );

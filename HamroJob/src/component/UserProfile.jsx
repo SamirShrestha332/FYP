@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Navigation from './Navigation';
 import './UserProfile.css';
 
 function UserProfile() {
@@ -53,7 +54,7 @@ function UserProfile() {
         console.log('Fetching user data from server for email:', userData.email);
         try {
           const response = await axios.get(
-            `http://localhost:3000/users/profile?email=${encodeURIComponent(userData.email)}`,
+            `http://localhost:5000/users/profile?email=${encodeURIComponent(userData.email)}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           
@@ -120,7 +121,7 @@ function UserProfile() {
       
       // Use the updated endpoint without /api prefix
       const response = await axios.put(
-        'http://localhost:3000/users/profile/update',
+        'http://localhost:5000/users/profile/update',
         { ...formData, email: user.email }, // Include email in the request for user identification
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -177,28 +178,8 @@ function UserProfile() {
 
   return (
     <div className="full-page-container">
-      {/* Navigation from Homepage */}
-      <div className="nav">
-        <div className="logo">
-          <img className="Logo" src="/src/assets/Logo.png" alt="Job Portal Logo" />
-        </div>
-        <nav>
-          <ul>
-            <li><a href="/">Jobs</a></li>
-            <li><a href="/#about">About Us</a></li>
-            <li><a href="/applications">My Applications</a></li>
-          </ul>
-        </nav>
-        <div className="nav-controls">
-          <div className="search-icon">
-            <ion-icon name="search-outline" className="search-outline"></ion-icon>
-          </div>
-          {user && <div className="user-menu-trigger">
-            <span className="user-name">{user.username}</span>
-            <ion-icon name="chevron-down-outline"></ion-icon>
-          </div>}
-        </div>
-      </div>
+      {/* Use the Navigation component */}
+      <Navigation />
 
       <div className="user-profile-container">
         <div className="profile-sidebar">

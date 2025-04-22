@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./Homepage.css";
 import UserMenu from './UserMenu';
-import heroimage1 from "/src/assets/Heroimage1.jpeg";
-import heroimage2 from "/src/assets/Heroimage2.jpeg";
+import axios from 'axios';
 
 function Homepage() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     // Check if user is logged in from localStorage
@@ -27,7 +28,50 @@ function Homepage() {
       setLoading(false);
     };
 
+    // Fetch jobs from API
+    const fetchJobs = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/jobs', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        
+        if (response.data && response.data.jobs) {
+          // Get the latest 6 jobs
+          const latest = response.data.jobs.slice(0, 6);
+          setFeaturedJobs(latest);
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        // Use dummy data if API fails
+        setFeaturedJobs([
+          {
+            id: 1,
+            title: "Frontend Developer",
+            company: "Hirely",
+            location: "Kathmandu",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            title: "Backend Developer",
+            company: "Hamro Job",
+            location: "Kathmandu",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 3,
+            title: "HR Manager",
+            company: "Tech Solution",
+            location: "Bhaktapur",
+            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        ]);
+      }
+    };
+
     checkLoginStatus();
+    fetchJobs();
   }, []);
 
   const handleSignUpClick = () => {
@@ -38,187 +82,250 @@ function Homepage() {
     navigate('/login');
   };
 
-    const jobs = [
-      {
-        companyLogo: "/src/assets/Companylogo.png",
-        jobDetails: "Lorem ipsum dolor sitolore, ut nihil sed eos blanditiis error rerum?",
-        companyname:"Xyz company",
-        time: "1 day ago",
-      },
-      {
-        companyLogo: "/src/assets/Companylogo.png",
-        jobDetails: "Another job description here.  A longer one this time, to test the layout.",
-        companyname:"Xyz company",
-        time: "3 days ago",
-      },
-      {
-        companyLogo: "/src/assets/Companylogo.png",
-        jobDetails: "Yet another job opportunity! This one sounds exciting.",
-        companyname:"Xyz company",
-        time: "5 days ago",
-      },
-      {
-        companyLogo: "/src/assets/Companylogo.png",
-        jobDetails: "A fourth job posting.  We're filling up the grid!",
-        companyname:"Xyz company",
-        time: "1 week ago",
-      },
-      {
-        companyLogo: "/src/assets/Companylogo.png",
-        jobDetails: "Fifth job -  almost there! Testing the responsiveness.",
-        companyname:"Xyz company",
-        time: "2 week ago",
-      },
-      {
-        companyLogo: "/src/assets/Companylogo.png",
-        jobDetails: "The sixth and final job.  Let's see how it looks!",
-        companyname:"Xyz company",
-        time: "1month ago",
-      },
-    ];
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/jobs?search=${searchTerm}`);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 1) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return `${Math.floor(diffDays / 30)} months ago`;
+  };
+
   return (
-    <div className="Homepage_container"> 
-      <div className="homepage">
+    <div className="homepage-container"> 
+      {/* Navigation */}
+      <div className="nav">
+        <div className="logo">
+          <img className="logo-img" src="/src/assets/Logo.png" alt="HamroJob Logo" />
+        </div>
+        <nav>
+          <ul>
+            <li><a href="/jobs">Jobs</a></li>
+            <li><a href="/about-us">About Us</a></li>
+            {isLoggedIn && <li><a href="/applications">My Applications</a></li>}
+          </ul>
+        </nav>
 
-        <div className="nav">
-          <div className="logo">
-            <img className="Logo" src="/src/assets/Logo.png" alt="Job Portal Logo" />
+        <div className="nav-controls">
+          <div className="search-icon">
+            <ion-icon name="search-outline" className="search-outline"></ion-icon>
           </div>
-          <nav>
-            <ul>
-              <li><a href="/jobs">Jobs</a></li>
-              <li><a href="#">About Us</a></li>
-              {isLoggedIn && <li><a href="/applications">My Applications</a></li>}
-            </ul>
-          </nav>
+          {isLoggedIn ? (
+            <UserMenu userData={userData} />
+          ) : (
+            <>
+              <button className="signin-button" onClick={handleSignUpClick}>SignUp</button>
+              <button className="login-button" onClick={handleLoginClick}>LogIn</button>
+            </>
+          )}
+        </div>
+      </div>
 
-          <div className="nav-controls">
-            <div className="search-icon">
-              <ion-icon name="search-outline" className="search-outline"></ion-icon>
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero-content">
+          <h1>Find Your Dream Job</h1>
+          <p>Discover thousands of job opportunities with all the information you need.</p>
+          <form className="search-form" onSubmit={handleSearch}>
+            <div className="search-container">
+              <div className="search-input-wrapper">
+                <ion-icon name="briefcase-outline"></ion-icon>
+                <input 
+                  type="text" 
+                  placeholder="Job title, keywords, or company" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="search-button">
+                Find Jobs
+              </button>
             </div>
-            {isLoggedIn ? (
-              <UserMenu userData={userData} />
-            ) : (
-              <>
-                <button className="signin-button" onClick={handleSignUpClick}>SignUp</button>
-                <button className="login-button" onClick={handleLoginClick}>LogIn</button>
-              </>
-            )}
+          </form>
+          <div className="search-tags">
+            <p>Popular searches:</p>
+            <div className="tags">
+              <span onClick={() => navigate('/jobs?search=developer')}>Developer</span>
+              <span onClick={() => navigate('/jobs?search=designer')}>Designer</span>
+              <span onClick={() => navigate('/jobs?search=marketing')}>Marketing</span>
+              <span onClick={() => navigate('/jobs?search=remote')}>Remote</span>
+            </div>
           </div>
         </div>
+      </section>
 
-        <section className="hero">
-          <div className="hero-content">
-            <h1>Get ready with Hamro Job</h1>
-            <p>Find your future job, internship, or training</p>
-            <div className="search-bar">
-              <input type="text" placeholder="Profession, company, training..." />
-              <button>Search</button>
+      {/* Featured Jobs Section */}
+      <section className="featured-jobs">
+        <div className="section-header">
+          <h2>Featured Job Opportunities</h2>
+          <p>Find your perfect position in top companies across Nepal</p>
+        </div>
+        
+        <div className="jobs-grid">
+          {featuredJobs.length > 0 ? (
+            featuredJobs.map((job, index) => (
+              <div className="job-card" key={index} onClick={() => navigate(`/job/${job.id}`)}>
+                <div className="job-card-header">
+                  <div className="company-logo">
+                    <img src="/src/assets/Companylogo.png" alt={`${job.company} logo`} />
+                  </div>
+                  <div className="job-meta">
+                    <span className="job-date">{formatDate(job.created_at)}</span>
+                    <span className="job-type">{job.job_type || 'Full-time'}</span>
+                  </div>
+                </div>
+                <div className="job-card-body">
+                  <h3 className="job-title">{job.title}</h3>
+                  <p className="company-name">{job.company}</p>
+                  <div className="job-location">
+                    <ion-icon name="location-outline"></ion-icon>
+                    <span>{job.location}</span>
+                  </div>
+                </div>
+                <div className="job-card-footer">
+                  <button className="view-job-btn">View Details</button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-jobs">
+              <p>Loading job opportunities...</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="view-more">
+          <button className="view-all-btn" onClick={() => navigate('/jobs')}>
+            View All Jobs
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="how-it-works">
+        <div className="section-header">
+          <h2>How HamroJob Works</h2>
+          <p>Simple steps to find your next career opportunity</p>
+        </div>
+        
+        <div className="steps-container">
+          <div className="step">
+            <div className="step-icon">
+              <ion-icon name="search-outline"></ion-icon>
+            </div>
+            <h3>Search Jobs</h3>
+            <p>Browse through our extensive list of jobs across various industries.</p>
+          </div>
+          
+          <div className="step">
+            <div className="step-icon">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+            <h3>Create Profile</h3>
+            <p>Build your professional profile and upload your resume.</p>
+          </div>
+          
+          <div className="step">
+            <div className="step-icon">
+              <ion-icon name="paper-plane-outline"></ion-icon>
+            </div>
+            <h3>Apply</h3>
+            <p>Apply to jobs with a single click and track your applications.</p>
+          </div>
+          
+          <div className="step">
+            <div className="step-icon">
+              <ion-icon name="briefcase-outline"></ion-icon>
+            </div>
+            <h3>Get Hired</h3>
+            <p>Interview, receive offers, and start your new career journey.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Preview Section */}
+      <section className="about-us-preview">
+        <div className="about-content">
+          <div className="about-text">
+            <h2>Nepal's Premier Job Portal</h2>
+            <p>HamroJob connects talented professionals with the best companies across Nepal. Whether you're looking for your first job, a career change, or taking the next step in your professional journey, we're here to help.</p>
+            <p>Our platform is designed to make the job search process simple, efficient, and effective for both job seekers and employers.</p>
+            <button className="learn-more-btn" onClick={() => navigate('/about-us')}>
+              Learn More About Us
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+            </button>
+          </div>
+          <div className="about-image">
+            <img src="/src/assets/Heroimage2.jpeg" alt="Team working" />
+          </div>
+        </div>
+      </section>
+      
+      {/* Call to Action Section */}
+      {!isLoggedIn && (
+        <section className="cta-section">
+          <div className="cta-content">
+            <h2>Ready to Take the Next Step in Your Career?</h2>
+            <p>Join thousands of professionals who've found their dream jobs through HamroJob</p>
+            <div className="cta-buttons">
+              <button className="cta-signup" onClick={handleSignUpClick}>
+                Create an Account
+              </button>
+              <button className="cta-login" onClick={handleLoginClick}>
+                Sign In
+              </button>
             </div>
           </div>
-          <div className="hero-image"><img src="/src/assets/HeroImage.jpeg" alt="Hero Image" /></div>
         </section>
+      )}
 
-        <div className="jobsection">
-          <p className="Heading">Find your Job</p>
-          <p>More than 100 job offers are waiting for you, open-up yourself to a new world of opportunities.</p>
-          <div className="job_container">
-        {jobs.map((job, index) => (
-          <div className="jobs" key={index}>
-            <div className="image_sections">
-              <img src={job.companyLogo} alt="companylogo" />
-            </div>
-            <div className="job_info">
-              <p className="jobdetails">{job.jobDetails}</p>
-              <div className="companyname">{job.companyname}</div>
-              <div className="jobtime_button">
-                <p className="time">{job.time}</p>
-                <button>View Job</button> {/* Corrected button text */}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <button className="View_All_Button">View all jobs</button>
-        </div>
-
-         <div className="About_us_section">
-         <div className="AboutUs_title">
-          <p>A</p>
-          <p>B</p>
-          <p>O</p>
-          <p>U</p>
-          <p>T</p>
-          <br/>
-          <p>U</p>
-          <p>S</p>
-
-         </div>
-        
-            <div className="image-section-aboutus">
-            <img src={heroimage2} alt="Workplace Scene 2" />
-                <img src={heroimage1} alt="Workplace Scene 1" />
-                
-            </div>
-            <div className="side-container">
-                <div className="title-container">
-                    <h1 >Hamrojob</h1>
-                </div>
-                <div className="description-container">
-                    <p>
-                        HamroJob.com is a privileged partner if you want to inquire information about Employment .
-                    </p>
-                </div>
-                <div className="more-info-label">
-                    <strong>More information</strong>
-                </div>
-                <div className="buttons-container">
-                    <a href="#">Apply for online job offers.</a>
-                    <a href="#">Consult the calendar of our events.</a>
-                    <a href="#">Consult our training offers.</a>
-                </div>
-            </div>
-        </div>
-        
-        {/* Only show create account section if not logged in */}
-        {!isLoggedIn && (
-          <div className="create-account-section">
-            <div className="create-account-content">
-              <h2 className="create-account-title">Create an account</h2>
-              <p className="create-account-free">FREE & SECURED</p>
-              <p className="create-account-description">Quickly apply to ads and much more...</p>
-              <p className="create-account-description">Join the Hamrojob.com community and discover all that your account can offer you.</p>
-              <p className="create-account-advantages">The advantages of the Hamrojob.com account</p>
-              <div className="create-account-buttons">
-                <button className="create-account-signup" onClick={handleSignUpClick}>Sign up</button>
-                <button className="create-account-login" onClick={handleLoginClick}>Log in</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer Section */}
+      {/* Footer */}
       <footer className="homepage-footer">
         <div className="footer-content">
-          <div className="footer-section">
+          <div className="footer-section about">
+            <h3>About HamroJob</h3>
+            <p>Connecting talented professionals with top employers across Nepal since 2025.</p>
+            <div className="contact">
+              <p><ion-icon name="mail-outline"></ion-icon> info@hamrojob.com</p>
+              <p><ion-icon name="call-outline"></ion-icon> +977-1-4123456</p>
+            </div>
+          </div>
+          
+          <div className="footer-section links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="/jobs">Browse Jobs</a></li>
+              <li><a href="/about-us">About Us</a></li>
+              <li><a href="#">Contact</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+            </ul>
+          </div>
+          
+          <div className="footer-section locations">
             <h3>Our Locations</h3>
             <ul>
-              <li>Kathmandu - Main Office</li>
-              <li>Pokhara</li>
-              <li>Biratnagar</li>
+              <li><ion-icon name="location-outline"></ion-icon> Kathmandu - Main Office</li>
+              <li><ion-icon name="location-outline"></ion-icon> Pokhara</li>
+              <li><ion-icon name="location-outline"></ion-icon> Biratnagar</li>
             </ul>
           </div>
-          <div className="footer-section">
-            <h3>Contact Us</h3>
-            <ul>
-              <li>Email: info@hamrojob.com</li>
-              <li>Phone: +977-1-4123456</li>
-              <li>Address: Kathmandu, Nepal</li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h3>Follow Us</h3>
+          
+          <div className="footer-section newsletter">
+            <h3>Stay Connected</h3>
+            <p>Follow us on social media for updates on new job opportunities.</p>
             <div className="social-icons">
               <a href="#"><ion-icon name="logo-facebook"></ion-icon></a>
               <a href="#"><ion-icon name="logo-twitter"></ion-icon></a>
@@ -227,8 +334,9 @@ function Homepage() {
             </div>
           </div>
         </div>
+        
         <div className="footer-bottom">
-          <p>&copy; 2025 HamroJob. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} HamroJob. All rights reserved.</p>
         </div>
       </footer>
     </div>

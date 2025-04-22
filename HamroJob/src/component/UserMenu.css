@@ -9,13 +9,19 @@
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 4px;
-  transition: background-color 0.3s;
-  color: #ec24d2; /* Bright magenta color as shown in screenshot */
+  transition: all 0.3s;
+  color: #007bff; /* Blue to match homepage theme */
   font-weight: 500;
 }
 
+.user-icon {
+  font-size: 1.5rem;
+  margin-right: 8px;
+  color: #007bff;
+}
+
 .user-menu-trigger:hover {
-  background-color: rgba(236, 36, 210, 0.1);
+  background-color: rgba(0, 123, 255, 0.1);
 }
 
 .user-name {
@@ -30,10 +36,22 @@
   width: 300px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   overflow: hidden;
   padding: 20px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-info {
@@ -67,15 +85,24 @@
 }
 
 .welcome-message {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #666;
   margin: 10px 0 20px 0;
+  padding: 10px;
+  background-color: rgba(0, 123, 255, 0.08);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-message::before {
+  margin-right: 6px;
 }
 
 .menu-options {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 20px 0;
 }
 
 .menu-options li {
@@ -94,65 +121,77 @@
   color: #333;
   text-decoration: none;
   font-size: 0.95rem;
+  transition: color 0.3s;
+  padding: 8px 0;
 }
 
 .menu-options li:first-child a {
-  color: #ec24d2; /* Bright magenta color for "My profile" */
+  color: #007bff; /* Blue to match homepage theme */
   font-weight: 500;
 }
 
 .menu-options a:hover {
-  color: #ec24d2;
+  color: #007bff; /* Blue to match homepage theme */
 }
 
 .count {
   background-color: #f1f1f1;
   color: #666;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .logout-button {
   width: 100%;
-  padding: 8px;
-  background-color: #ec24d2; /* Bright magenta color as shown in screenshot */
+  padding: 10px;
+  background-color: #007bff; /* Blue to match homepage theme */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  margin-top: 10px;
+  margin-top: 5px;
+  transition: background-color 0.3s;
 }
 
 .logout-button:hover {
-  background-color: #d214ba;
+  background-color: #0069d9;
 }
 
 .footer-links {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
-  padding-top: 10px;
+  padding-top: 15px;
   border-top: 1px solid #eee;
   font-size: 0.8rem;
 }
 
 .footer-links a {
-  color: #666;
+  color: #888;
   text-decoration: none;
+  transition: color 0.3s;
 }
 
 .footer-links a:hover {
-  text-decoration: underline;
+  color: #007bff; /* Blue to match homepage theme */
+  text-decoration: none;
 }
 
 @media (max-width: 768px) {
   .user-menu-dropdown {
-    width: 250px;
+    width: 280px;
+    right: -10px;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
   }
 }

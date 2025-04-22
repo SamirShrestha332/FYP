@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Signup from "./component/Signup";
 import Login from "./component/Login";
 import Homepage from "./component/Homepage";
@@ -15,19 +15,103 @@ import UserApplications from "./component/UserApplications";
 import ProtectedRoute from "./component/ProtectedRoute";
 import JobSection from "./component/JobSection";
 import "./App.css";
+import JobApplicationPage from './component/JobApplicationPage';
 import "./component/admin/AdminStyles.css";
 import OTPVerification from './component/OTPVerification';
+import RecruiterSignup from './component/recruiter/RecruiterSignup';
+import RecruiterLogin from './component/recruiter/RecruiterLogin';
+import RecruiterDashboard from './component/recruiter/RecruiterDashboard';
+import RecruiterJobs from './component/recruiter/RecruiterJobs';
+import RecruiterPostJob from './component/recruiter/RecruiterPostJob';
+import RecruiterApplicants from './component/recruiter/RecruiterApplicants';
+import RecruiterProfile from './component/recruiter/RecruiterProfile';
+import RecruiterEditJob from './component/recruiter/RecruiterEditJob';
+import AboutUs from './component/AboutUs';
+import TermsOfService from './component/TermsOfService';
+import PaymentCheck from './component/recruiter/Payment/PaymentCheck';
+
+
+import JobDetail from './component/JobDetail';
+import Esewapayment from './component/recruiter/Payment/EsewaPayment.jsx';
+import ProtectedJobRoute from './component/recruiter/ProtectedJobRoute';
+
+import PaymentSuccess from './component/recruiter/Payment/PaymentSuccess';
 
 function App() {
   return (
+ 
+    
+    
     <Router>
       <Routes>
+      
         {/* Public Routes */}
         <Route path="/" element={<Homepage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<OTPVerification />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<TermsOfService />} />
+        <Route path="/help" element={<TermsOfService />} />
         
+        {/* Recruiter Routes */}
+        <Route path="/recruiter/payment" element={
+          <ProtectedRoute>
+            <Esewapayment />
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/payment/success" element={
+          <ProtectedRoute>
+            <PaymentSuccess />
+          </ProtectedRoute>
+        } />
+        <Route path="/payment/success" element={
+          <Navigate to="/recruiter/payment/success" />
+        } />
+        <Route path="/payment/failure" element={<Navigate to="/recruiter/payment" />} />
+        <Route path="/recruiter/signup" element={<RecruiterSignup />} />
+        <Route path="/recruiter/login" element={<RecruiterLogin />} />
+        <Route path="/recruiter/dashboard" element={
+          <ProtectedRoute>
+            <RecruiterDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/jobs" element={
+          <ProtectedRoute>
+            <RecruiterJobs />
+          </ProtectedRoute>
+        } />
+        {/* Update this route to use ProtectedJobRoute instead of ProtectedRoute */}
+        <Route path="/recruiter/post-job" element={
+          <ProtectedRoute>
+            <PaymentCheck>
+              <RecruiterPostJob />
+            </PaymentCheck>
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/jobs/edit/:jobId" element={
+          <ProtectedRoute>
+            <RecruiterEditJob />
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/job/:id" element={
+          <ProtectedRoute>
+            <JobDetail isRecruiterView={true} />
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/applicants" element={
+          <ProtectedRoute>
+            <RecruiterApplicants />
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/profile" element={
+          <ProtectedRoute>
+            <RecruiterProfile />
+          </ProtectedRoute>
+        } />
+        
+
         {/* User Routes - Protected */}
         <Route path="/profile" element={
           <ProtectedRoute>
@@ -45,11 +129,10 @@ function App() {
           </ProtectedRoute>
         } />
         
-        <Route path="/jobs" element={
-          <ProtectedRoute>
-            <JobSection />
-          </ProtectedRoute>
-        } />
+        {/* Add these new routes for jobs */}
+        <Route path="/jobs" element={<JobSection />} />
+        <Route path="/job/:id" element={<JobDetail />} />
+        
         <Route path="/searches" element={
           <ProtectedRoute>
             <Homepage />
@@ -83,8 +166,15 @@ function App() {
         <Route path="/admin/jobs" element={<Jobs />} />
         <Route path="/admin/applications" element={<Applications />} />
         <Route path="/admin/settings" element={<Settings />} />
+        {/* Application route - Protected so only logged in users can apply */}
+        <Route path="/apply/:jobId" element={
+          <ProtectedRoute>
+            <JobApplicationPage />
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
+    
   );
 }
 

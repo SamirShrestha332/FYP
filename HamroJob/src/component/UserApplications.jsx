@@ -30,39 +30,34 @@ function UserApplications() {
         const userData = JSON.parse(userString);
         setUser(userData);
         
-        // Then fetch updated user data and applications from server
+        // Then fetch applications from server
         try {
-          // Get updated user data
-          const userResponse = await axios.get('http://localhost:3000/api/users/me', {
-            headers: { Authorization: `Bearer ${token}` }
+          const response = await fetch(`http://localhost:5000/api/applications/user/${userData.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
           });
           
-          if (userResponse.data && userResponse.data.user) {
-            setUser(userResponse.data.user);
-            localStorage.setItem('user', JSON.stringify(userResponse.data.user));
+          if (!response.ok) {
+            throw new Error('Failed to fetch applications');
           }
           
-          // Fetch applications
-          const appResponse = await axios.get('http://localhost:3000/api/applications/user', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          
-          if (appResponse.data && appResponse.data.applications) {
-            setApplications(appResponse.data.applications);
-          }
-        } catch (serverError) {
-          console.error('Error fetching data from server:', serverError);
+          const data = await response.json();
+          console.log('Applications data:', data); // Debug log
+          setApplications(data.applications || []);
+        } catch (fetchError) {
+          console.error('Error fetching applications:', fetchError);
           setError('Failed to fetch your applications. Please try again later.');
-          // If server request fails, we'll use the data from localStorage
         }
+        
       } catch (err) {
-        console.error('Error loading applications:', err);
-        setError('Failed to load application data');
+        console.error('Error in fetchUserData:', err);
+        setError('Failed to fetch your applications. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchUserData();
   }, [navigate]);
 
@@ -186,11 +181,16 @@ function UserApplications() {
                     <div className="application-details">
                       <h3>{app.jobTitle}</h3>
                       <p className="company-name">{app.companyName}</p>
-                      <p className="application-date">Applied on: {new Date(app.appliedDate).toLocaleDateString()}</p>
+                      <p className="application-date">Applied on: {app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : 'Pending'}</p>
                       <p className="application-status">Status: <span className={app.status.toLowerCase()}>{app.status}</span></p>
                     </div>
                     <div className="application-actions">
-                      <button className="view-application">View Application</button>
+                      <button 
+                        className="view-application"
+                        onClick={() => navigate(`/application-details/${app.id}`)}
+                      >
+                        View Application
+                      </button>
                     </div>
                   </div>
                 ))}
