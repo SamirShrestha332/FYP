@@ -32,13 +32,19 @@ function UserApplications() {
         
         // Then fetch applications from server
         try {
+          // Add better error handling and debugging
+          console.log('User ID:', userData.id);
+          console.log('Token:', token ? 'Token exists' : 'No token');
+          
           const response = await axios.get(
             `http://localhost:5000/api/applications/user/${userData.id}`,
             { 
               headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-              } 
+              },
+              // Add timeout to prevent hanging requests
+              timeout: 10000
             }
           );
           
@@ -203,7 +209,7 @@ function UserApplications() {
                     <div className="company-logo">
                       <img src="/src/assets/Companylogo.png" alt="Company Logo" />
                     </div>
-                    // In the render section where you display the application card
+                  
                     <div className="application-details">
                       <h3 className="company-name">{app.companyName}</h3>
                       <p className="job-title">{app.jobTitle}</p>

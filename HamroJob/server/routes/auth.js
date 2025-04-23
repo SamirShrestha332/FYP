@@ -6,6 +6,32 @@ import { otpStore, generateOTP } from '../utils/otp.js';
 
 const router = express.Router();
 
+// Authentication middleware
+export const authenticateToken = (req, res, next) => {
+  try {
+    // Get token from header
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No authentication token, access denied' });
+    }
+    
+    // Verify token
+    // For now, we're using a simple token validation
+    // In a production environment, you should use JWT or another secure method
+    if (token) {
+      // Set user info to req.user
+      req.user = { token };
+      next();
+    } else {
+      return res.status(401).json({ message: 'Token is not valid' });
+    }
+  } catch (error) {
+    console.error('Authentication error:', error);
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+};
+
 // Signup with OTP
 router.post('/signup', async (req, res) => {
   try {

@@ -8,9 +8,6 @@ import userRoutes from './routes/user.js';
 import jobRoutes from './routes/job.js';
 import applicationsRoutes from './routes/applications.js'; // Changed to ES module import
 
-
-;
-
 // Initialize express app
 const app = express();
 const PORT = process.env.PORT || 5000;

@@ -2,6 +2,8 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import { db } from '../config/db.js';
 import { sendWelcomeEmail } from '../config/email.js';
+// Import the authentication middleware
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -206,170 +208,209 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-// Payment webhook endpoint - captures eSewa payment data
-router.post('/payment-webhook', async (req, res) => {
-    try {
-        console.log('Payment webhook received:', req.body);
-        const { 
-            transaction_uuid, 
-            total_amount,
-            product_code,
-            status,
-            signed_field_names,
-            signature,
-            user_id
-        } = req.body;
+// Add this endpoint to your recruiter.js file
 
-        // Validate the required payment data
-        if (!transaction_uuid || !total_amount) {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing required payment information'
-            });
-        }
-
-        // Get user info from token or request
-        const recruiterId = req.body.user_id || null;
-        
-        // Determine plan type based on amount
-        let planType = 'basic';
-        if (parseFloat(total_amount) >= 3000) {
-            planType = 'premium';
-        } else if (parseFloat(total_amount) >= 2000) {
-            planType = 'standard';
-        }
-        
-        // Calculate expiry date based on plan
-        const today = new Date();
-        let validityDays = 7; // Default for basic plan
-        
-        if (planType === 'standard') {
-            validityDays = 15;
-        } else if (planType === 'premium') {
-            validityDays = 30;
-        }
-        
-        const expiryDate = new Date(today);
-        expiryDate.setDate(today.getDate() + validityDays);
-        
-        // Format expiry date for MySQL
-        const formattedExpiryDate = expiryDate.toISOString().split('T')[0];
-        
-        // Insert payment record into database
-        const insertQuery = `
-            INSERT INTO payments (
-                recruiter_id, 
-                transaction_id, 
-                amount, 
-                plan_type, 
-                payment_method, 
-                payment_status, 
-                payment_date
-            ) VALUES (?, ?, ?, ?, ?, ?, NOW())
-        `;
-        
-        const values = [
-            recruiterId, 
-            transaction_uuid, 
-            total_amount, 
-            planType, 
-            'esewa',
-            status || 'completed'
-        ];
-        
-        db.query(insertQuery, values, (err, result) => {
-            if (err) {
-                console.error('Error saving payment:', err);
-                return res.status(500).json({
-                    success: false,
-                    message: 'Failed to save payment information'
-                });
-            }
-            
-            console.log('Payment saved successfully:', transaction_uuid);
-            
-            // Update recruiter subscription status
-            if (recruiterId) {
-                // First check if recruiter_subscriptions record exists
-                const checkSubscriptionQuery = `
-                    SELECT * FROM recruiter_subscriptions WHERE recruiter_id = ?
-                `;
-                
-                db.query(checkSubscriptionQuery, [recruiterId], (checkErr, checkResult) => {
-                    if (checkErr) {
-                        console.error('Error checking subscription:', checkErr);
-                    } else {
-                        let updateQuery;
-                        let updateValues;
-                        
-                        if (checkResult.length > 0) {
-                            // Update existing subscription
-                            updateQuery = `
-                                UPDATE recruiter_subscriptions 
-                                SET 
-                                    plan_type = ?,
-                                    expiry_date = ?,
-                                    status = 'active',
-                                    updated_at = NOW()
-                                WHERE recruiter_id = ?
-                            `;
-                            updateValues = [planType, formattedExpiryDate, recruiterId];
-                        } else {
-                            // Create new subscription
-                            updateQuery = `
-                                INSERT INTO recruiter_subscriptions (
-                                    recruiter_id,
-                                    plan_type,
-                                    expiry_date,
-                                    status,
-                                    created_at,
-                                    updated_at
-                                ) VALUES (?, ?, ?, 'active', NOW(), NOW())
-                            `;
-                            updateValues = [recruiterId, planType, formattedExpiryDate];
-                        }
-                        
-                        db.query(updateQuery, updateValues, (updateErr) => {
-                            if (updateErr) {
-                                console.error('Error updating recruiter subscription:', updateErr);
-                            } else {
-                                console.log('Recruiter subscription updated successfully for ID:', recruiterId);
-                            }
-                        });
-                    }
-                });
-                
-                // Also update recruiter's subscription_status in recruiter table
-                const updateRecruiterQuery = `
-                    UPDATE recruiter 
-                    SET subscription_status = 'active'
-                    WHERE id = ?
-                `;
-                
-                db.query(updateRecruiterQuery, [recruiterId], (recruiterErr) => {
-                    if (recruiterErr) {
-                        console.error('Error updating recruiter status:', recruiterErr);
-                    }
-                });
-            }
-            
-            res.status(200).json({
-                success: true,
-                message: 'Payment recorded successfully',
-                subscription: {
-                    plan: planType,
-                    expiryDate: formattedExpiryDate
-                }
-            });
-        });
-    } catch (error) {
-        console.error('Payment webhook error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error processing payment',
-            error: error.message
-        });
+// Payment webhook endpoint
+router.post('/payment-webhook', authenticateToken, async (req, res) => {
+  try {
+    const {
+      transaction_id,
+      recruiter_id,
+      amount,
+      plan_type,
+      payment_method,
+      status,
+      job_posts_allowed,
+      validity_days,
+      expiry_date
+    } = req.body;
+    
+    console.log('Payment webhook received:', req.body);
+    
+    // Ensure we have a valid recruiter_id
+    if (!recruiter_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recruiter ID is required'
+      });
     }
+    
+    // Verify the recruiter exists
+    const checkRecruiterQuery = 'SELECT id FROM recruiter WHERE id = ?';
+    
+    // Use a promise to ensure sequential execution and avoid race conditions
+    const processPayment = () => {
+      return new Promise((resolve, reject) => {
+        db.query(checkRecruiterQuery, [recruiter_id], (err, recruiterResults) => {
+          if (err) {
+            console.error('Error checking recruiter:', err);
+            return reject({
+              status: 500,
+              message: 'Error checking recruiter',
+              error: err.message
+            });
+          }
+          
+          if (recruiterResults.length === 0) {
+            return reject({
+              status: 400,
+              message: 'Invalid recruiter ID'
+            });
+          }
+          
+          // Generate a unique transaction ID if not provided
+          const paymentTransactionId = transaction_id || `manual-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+          
+          // Calculate expiry date if not provided
+          let expiryDateValue = expiry_date;
+          if (!expiryDateValue) {
+            const days = validity_days || 30; // Default to 30 days
+            const date = new Date();
+            date.setDate(date.getDate() + parseInt(days));
+            expiryDateValue = date.toISOString().split('T')[0];
+          }
+          
+          // First check if a payment record already exists for this recruiter
+          const checkPaymentQuery = 'SELECT id FROM payments WHERE recruiter_id = ?';
+          db.query(checkPaymentQuery, [recruiter_id], (err, paymentResults) => {
+            if (err) {
+              console.error('Error checking payment records:', err);
+              return reject({
+                status: 500,
+                message: 'Error checking payment records',
+                error: err.message
+              });
+            }
+            
+            let query, params;
+            
+            // If payment record exists, update it instead of inserting a new one
+            if (paymentResults.length > 0) {
+              query = `
+                UPDATE payments SET
+                  transaction_id = ?,
+                  amount = ?,
+                  plan_type = ?,
+                  payment_method = ?,
+                  payment_status = ?,
+                  payment_date = NOW(),
+                  job_posts_allowed = ?,
+                  job_posts_used = 0,
+                  expiry_date = ?,
+                  updated_at = NOW()
+                WHERE recruiter_id = ?
+              `;
+              
+              params = [
+                paymentTransactionId,
+                amount || 0,
+                plan_type || 'basic',
+                payment_method || 'esewa',
+                status || 'completed',
+                job_posts_allowed || 1,
+                expiryDateValue,
+                recruiter_id
+              ];
+            } else {
+              // If no payment record exists, insert a new one
+              query = `
+                INSERT INTO payments (
+                  transaction_id,
+                  recruiter_id,
+                  amount,
+                  plan_type,
+                  payment_method,
+                  payment_status,
+                  payment_date,
+                  job_posts_allowed,
+                  job_posts_used,
+                  expiry_date,
+                  updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, NOW())
+              `;
+              
+              params = [
+                paymentTransactionId,
+                recruiter_id,
+                amount || 0,
+                plan_type || 'basic',
+                payment_method || 'esewa',
+                status || 'completed',
+                job_posts_allowed || 1,
+                0, // job_posts_used starts at 0
+                expiryDateValue
+              ];
+            }
+            
+            db.query(query, params, (err, result) => {
+              if (err) {
+                console.error('Error processing payment record:', err);
+                console.error('Query:', query);
+                console.error('Params:', params);
+                return reject({
+                  status: 500,
+                  message: 'Failed to process payment',
+                  error: err.message
+                });
+              }
+              
+              console.log('Payment record processed successfully:', result);
+              
+              // Update recruiter subscription status
+              const updateRecruiterQuery = `
+                UPDATE recruiter 
+                SET subscription_status = 'active' 
+                WHERE id = ?
+              `;
+              
+              db.query(updateRecruiterQuery, [recruiter_id], (err, updateResult) => {
+                if (err) {
+                  console.error('Error updating recruiter status:', err);
+                  return reject({
+                    status: 500,
+                    message: 'Failed to update recruiter status',
+                    error: err.message
+                  });
+                }
+                
+                const subscription = {
+                  plan_type: plan_type || 'basic',
+                  job_posts_allowed: job_posts_allowed || 1,
+                  job_posts_used: 0,
+                  expiry_date: expiryDateValue
+                };
+                
+                console.log('Payment data processed:', {
+                  success: true,
+                  message: 'Payment processed successfully',
+                  subscription
+                });
+                
+                resolve({
+                  success: true,
+                  message: 'Payment processed successfully',
+                  subscription
+                });
+              });
+            });
+          });
+        });
+      });
+    };
+    
+    // Execute the payment processing
+    const result = await processPayment();
+    res.status(200).json(result);
+    
+  } catch (error) {
+    console.error('Error processing payment webhook:', error);
+    const status = error.status || 500;
+    res.status(status).json({
+      success: false,
+      message: error.message || 'Failed to process payment',
+      error: error.error || error.message
+    });
+  }
 });
 
 export default router;

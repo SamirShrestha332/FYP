@@ -137,6 +137,20 @@ const EsewaPayment = () => {
                 
                 // If we have transaction ID and user data, send to our webhook
                 if (userData && paymentPlan) {
+                    // Calculate expiry date
+                    const today = new Date();
+                    const expiryDate = new Date(today);
+                    const selectedPlan = localStorage.getItem('selectedPlan') || 'basic';
+                    
+                    // Define plan details
+                    const plans = {
+                      basic: { validity_days: 7, job_posts: 1 },
+                      standard: { validity_days: 15, job_posts: 3 },
+                      premium: { validity_days: 30, job_posts: -1 }
+                    };
+                    
+                    expiryDate.setDate(today.getDate() + plans[selectedPlan].validity_days);
+                    
                     const response = await fetch('http://localhost:5000/api/recruiter/payment-webhook', {
                         method: 'POST',
                         headers: {
@@ -144,24 +158,36 @@ const EsewaPayment = () => {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         },
                         body: JSON.stringify({
-                            transaction_uuid: transactionId,
-                            total_amount: paymentPlan.amount,
-                            user_id: userData.id,
-                            status: 'completed'
+                            transaction_id: transactionId,  // Changed from transaction_uuid to transaction_id
+                            recruiter_id: userData.id,      // Changed from user_id to recruiter_id
+                            amount: paymentPlan.amount,     // Changed from total_amount to amount
+                            plan_type: selectedPlan,
+                            payment_method: 'esewa',
+                            status: 'completed',
+                            job_posts_allowed: plans[selectedPlan].job_posts,
+                            validity_days: plans[selectedPlan].validity_days,
+                            expiry_date: expiryDate.toISOString().split('T')[0]
                         })
                     });
                     
                     const result = await response.json();
                     console.log('Payment data sent to webhook:', result);
                     
-                    // Clear the lastPaymentTransaction from localStorage
-                    localStorage.removeItem('lastPaymentTransaction');
-                    
-                    // Show success message before redirecting
-                    alert('Payment successful! You can now post jobs.');
-                    
-                    // Redirect to job posting page
-                    navigate('/recruiter/post-job');
+                    if (result.success) {
+                        // Payment was successful
+                        // Update the paymentPlan in localStorage to include paymentCompleted flag
+                        paymentPlan.paymentCompleted = true;
+                        localStorage.setItem('paymentPlan', JSON.stringify(paymentPlan));
+                        
+                        // Clear the lastPaymentTransaction from localStorage
+                        localStorage.removeItem('lastPaymentTransaction');
+                        
+                        // Redirect to success page
+                        navigate('/recruiter/payment/success');
+                    } else {
+                        console.error('Payment processing failed:', result.message);
+                        alert('Payment processing failed. Please try again or contact support.');
+                    }
                 }
             } catch (error) {
                 console.error('Error sending payment confirmation to server:', error);
@@ -172,6 +198,7 @@ const EsewaPayment = () => {
     checkPaymentStatus();
   }, [navigate]);
 
+  // Update the form inputs to use your custom success URL
   return (
     <div className="payment-container">
       <div className="payment-header">
@@ -248,17 +275,16 @@ const EsewaPayment = () => {
           <input type="hidden" name="signed_field_names" value="total_amount,transaction_uuid,product_code" />
           <input type="hidden" name="user_id" value={user?.id} />
 
-         
-          
+          {/* Update success and failure URLs */}
           <input
             type="hidden"
             name="success_url"
-            value="https://developer.esewa.com.np/success"
+            value="http://localhost:5173/recruiter/payment/success"
           />
           <input
             type="hidden"
             name="failure_url"
-            value="https://developer.esewa.com.np/failure"
+            value="http://localhost:5173/recruiter/payment/failure"
           />
 
           <button

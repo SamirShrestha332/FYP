@@ -1,160 +1,265 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import './PaymentStyles.css';
+import RecruiterHeader from '../RecruiterHeader';
+import { FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
   
   useEffect(() => {
-    const storePaymentData = async () => {
+    const processPayment = async () => {
       try {
-        // Get URL parameters
+        setLoading(true);
+        
+        // Get URL parameters from eSewa callback
         const params = new URLSearchParams(window.location.search);
-        const transactionId = params.get('oid') || params.get('transaction_uuid');
+        const transactionId = params.get('transaction_uuid') || params.get('oid');
         const status = params.get('status') || 'success';
+        const totalAmount = params.get('total_amount');
         
         // Get user data from localStorage
-        const userData = JSON.parse(localStorage.getItem('user'));
-        if (!userData) {
-          console.error('User data not found');
-          navigate('/recruiter/login');
+        const userData = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        
+        if (!userData || !token) {
+          setError('User session expired. Please log in again.');
+          setTimeout(() => navigate('/recruiter/login'), 3000);
           return;
         }
+        
+        const user = JSON.parse(userData);
         
         // Get selected plan from localStorage
         const selectedPlan = localStorage.getItem('selectedPlan') || 'basic';
         
         // Define plan details
         const plans = {
-          basic: { amount: 1000, job_posts: 1, validity_days: 7 },
-          standard: { amount: 2000, job_posts: 3, validity_days: 15 },
-          premium: { amount: 3000, job_posts: -1, validity_days: 30 }
+          basic: {
+            amount: 1000,
+            tax: 50,
+            title: "Basic Plan",
+            description: "Post 1 job with 7-day visibility.",
+            job_posts: 1,
+            validity_days: 7
+          },
+          standard: {
+            amount: 2000,
+            tax: 100,
+            title: "Standard Plan",
+            description: "Post up to 3 jobs with 15-day visibility + featured badge.",
+            job_posts: 3,
+            validity_days: 15
+          },
+          premium: {
+            amount: 3000,
+            tax: 150,
+            title: "Premium Plan",
+            description: "Unlimited job posts, 30-day visibility + top placement.",
+            job_posts: -1,
+            validity_days: 30
+          },
         };
         
+        const plan = plans[selectedPlan];
+        
         // Calculate expiry date
-        const expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getDate() + plans[selectedPlan].validity_days);
+        const today = new Date();
+        const expiryDate = new Date(today);
+        expiryDate.setDate(today.getDate() + plan.validity_days);
+        
+        // Check if payment was already processed (to prevent duplicate processing)
+        const existingPayment = localStorage.getItem('paymentPlan');
+        if (existingPayment) {
+          const paymentData = JSON.parse(existingPayment);
+          if (paymentData.transactionId === transactionId) {
+            console.log('Payment already processed, skipping API call');
+            setPaymentDetails(paymentData);
+            setLoading(false);
+            return;
+          }
+        }
         
         // Store payment data in database
-        const paymentResponse = await fetch('http://localhost:5000/api/payment/store', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
+        const response = await axios.post(
+          'http://localhost:5000/api/recruiter/payment-webhook',
+          {
             transaction_id: transactionId,
-            recruiter_id: userData.id,
-            amount: plans[selectedPlan].amount,
+            recruiter_id: user.id,
+            amount: plan.amount + plan.tax + 10, // Add service charge
             plan_type: selectedPlan,
             payment_method: 'esewa',
-            status: 'completed'
-          })
-        });
-        
-        const paymentResult = await paymentResponse.json();
-        console.log('Payment data stored:', paymentResult);
-        
-        // Store subscription data in database
-        const subscriptionResponse = await fetch('http://localhost:5000/api/payment/subscription', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            status: status,
+            job_posts_allowed: plan.job_posts,
+            validity_days: plan.validity_days,
+            expiry_date: expiryDate.toISOString().split('T')[0]
           },
-          body: JSON.stringify({
-            recruiter_id: userData.id,
-            plan: selectedPlan,
-            expiry_date: expiryDate.toISOString(),
-            is_active: 1
-          })
-        });
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
         
-        const subscriptionResult = await subscriptionResponse.json();
-        console.log('Subscription data stored:', subscriptionResult);
+        console.log('Payment data stored:', response.data);
         
-        // Store plan info in localStorage for client-side validation
+        // Store payment plan in localStorage for client-side tracking
         const paymentPlan = {
           plan: selectedPlan,
-          expiryDate: expiryDate.toISOString(),
-          jobPostsRemaining: plans[selectedPlan].job_posts,
+          expiryDate: expiryDate.toISOString().split('T')[0],
+          jobPostsRemaining: plan.job_posts,
           transactionId: transactionId,
-          amount: plans[selectedPlan].amount,
+          amount: plan.amount + plan.tax + 10,
           paymentCompleted: true
         };
         
         localStorage.setItem('paymentPlan', JSON.stringify(paymentPlan));
+        setPaymentDetails(paymentPlan);
         
-        // Redirect to post job page after a short delay
-        setTimeout(() => {
-          navigate('/recruiter/post-job');
-        }, 2000);
       } catch (error) {
-        console.error('Error storing payment data:', error);
-        // Still redirect to post job page even if there's an error
-        setTimeout(() => {
-          navigate('/recruiter/post-job');
-        }, 2000);
+        console.error('Error processing payment:', error);
+        
+        // If it's a duplicate entry error, we can still consider it successful
+        // since it means the payment was already processed
+        if (error.response && error.response.data && 
+            error.response.data.error && 
+            error.response.data.error.includes('Duplicate entry')) {
+          
+          // Get selected plan from localStorage
+          const selectedPlan = localStorage.getItem('selectedPlan') || 'basic';
+          const plans = {
+            basic: {
+              amount: 1000,
+              tax: 50,
+              job_posts: 1,
+              validity_days: 7
+            },
+            standard: {
+              amount: 2000,
+              tax: 100,
+              job_posts: 3,
+              validity_days: 15
+            },
+            premium: {
+              amount: 3000,
+              tax: 150,
+              job_posts: -1,
+              validity_days: 30
+            },
+          };
+          
+          const plan = plans[selectedPlan];
+          const today = new Date();
+          const expiryDate = new Date(today);
+          expiryDate.setDate(today.getDate() + plan.validity_days);
+          
+          const params = new URLSearchParams(window.location.search);
+          const transactionId = params.get('transaction_uuid') || params.get('oid');
+          
+          const paymentPlan = {
+            plan: selectedPlan,
+            expiryDate: expiryDate.toISOString().split('T')[0],
+            jobPostsRemaining: plan.job_posts,
+            transactionId: transactionId,
+            amount: plan.amount + plan.tax + 10,
+            paymentCompleted: true
+          };
+          
+          localStorage.setItem('paymentPlan', JSON.stringify(paymentPlan));
+          setPaymentDetails(paymentPlan);
+        } else {
+          setError('Failed to process payment. Please contact support.');
+        }
+      } finally {
+        setLoading(false);
       }
     };
     
-    storePaymentData();
+    processPayment();
   }, [navigate, location]);
   
+  const handleContinue = () => {
+    // Make sure the payment is marked as completed in localStorage
+    const paymentPlan = JSON.parse(localStorage.getItem('paymentPlan') || '{}');
+    paymentPlan.paymentCompleted = true;
+    localStorage.setItem('paymentPlan', JSON.stringify(paymentPlan));
+    
+    // Navigate to post job page
+    console.log('Navigating to post job page with payment plan:', paymentPlan);
+    
+    // Use window.location for a hard redirect to ensure it works
+    window.location.href = '/recruiter/post-job';
+  };
+  
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.successIcon}>✅</div>
-        <h2 style={styles.title}>Payment Successful!</h2>
-        <p style={styles.message}>
-          Your payment has been processed successfully. Your subscription is now active.
-        </p>
-        <p style={styles.redirectMessage}>
-          You will be redirected to the job posting page in a moment...
-        </p>
+    <div className="payment-success-container">
+      <RecruiterHeader />
+      
+      <div className="payment-success-content">
+        {loading ? (
+          <div className="payment-loading">
+            <div className="loader"></div>
+            <p>Processing your payment...</p>
+          </div>
+        ) : error ? (
+          <div className="payment-error">
+            <h2>Payment Error</h2>
+            <p>{error}</p>
+            <button onClick={() => navigate('/recruiter/dashboard')} className="back-button">
+              Back to Dashboard
+            </button>
+          </div>
+        ) : (
+          <div className="payment-success-card">
+            <div className="success-icon">
+              <FaCheckCircle />
+            </div>
+            
+            <h1>Payment Successful!</h1>
+            <p>Thank you for your subscription to HamroJob.</p>
+            
+            {paymentDetails && (
+              <div className="payment-details">
+                <h3>Payment Details</h3>
+                <div className="detail-row">
+                  <span>Plan:</span>
+                  <span>{paymentDetails.plan.charAt(0).toUpperCase() + paymentDetails.plan.slice(1)} Plan</span>
+                </div>
+                <div className="detail-row">
+                  <span>Amount:</span>
+                  <span>Rs. {paymentDetails.amount}</span>
+                </div>
+                <div className="detail-row">
+                  <span>Transaction ID:</span>
+                  <span>{paymentDetails.transactionId}</span>
+                </div>
+                <div className="detail-row">
+                  <span>Valid Until:</span>
+                  <span>{new Date(paymentDetails.expiryDate).toLocaleDateString()}</span>
+                </div>
+                <div className="detail-row">
+                  <span>Job Posts:</span>
+                  <span>{paymentDetails.jobPostsRemaining === -1 ? 'Unlimited' : paymentDetails.jobPostsRemaining}</span>
+                </div>
+              </div>
+            )}
+            
+            <div className="success-actions">
+              <button onClick={handleContinue} className="continue-button">
+                Post a Job Now <FaArrowRight />
+              </button>
+              <button onClick={() => navigate('/recruiter/dashboard')} className="dashboard-button">
+                Go to Dashboard
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
-    padding: '20px'
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    padding: '40px',
-    textAlign: 'center',
-    maxWidth: '500px',
-    width: '100%'
-  },
-  successIcon: {
-    fontSize: '64px',
-    marginBottom: '20px'
-  },
-  title: {
-    fontSize: '24px',
-    color: '#2ecc71',
-    marginBottom: '20px'
-  },
-  message: {
-    fontSize: '16px',
-    color: '#555',
-    marginBottom: '20px',
-    lineHeight: '1.5'
-  },
-  redirectMessage: {
-    fontSize: '14px',
-    color: '#888',
-    fontStyle: 'italic'
-  }
 };
 
 export default PaymentSuccess;
