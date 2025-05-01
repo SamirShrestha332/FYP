@@ -59,8 +59,9 @@
 }
 
 .dashboard-sections {
-    display: grid;
-    grid-template-columns: 1fr;
+display: flex;
+align-items: center;
+flex-direction: column;
     gap: 30px;
 }
 

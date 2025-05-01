@@ -9,12 +9,23 @@ function RecruiterHeader() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   useEffect(() => {
-    // Get user data from localStorage
-    const userData = localStorage.getItem('user');
+    // Get recruiter user data from localStorage
+    const userData = localStorage.getItem('recruiterUser') || localStorage.getItem('user');
     if (userData) {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      
+      // Verify this is a recruiter account
+      if (parsedUser.role === 'recruiter') {
+        setUser(parsedUser);
+      } else {
+        // If not a recruiter, redirect to login
+        navigate('/recruiter/login');
+      }
+    } else {
+      // If no user data, redirect to login
+      navigate('/recruiter/login');
     }
-  }, []);
+  }, [navigate]);
   
   // Determine which nav item is active based on current path
   const isActive = (path) => {
@@ -22,9 +33,10 @@ function RecruiterHeader() {
   };
 
   const handleLogout = () => {
-    // Clear local storage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    // Clear recruiter-specific local storage
+    localStorage.removeItem('recruiterUser');
+    localStorage.removeItem('recruiterToken');
+    localStorage.removeItem('recruiterLoggedIn');
     
     // Redirect to login page
     navigate('/recruiter/login');

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 23, 2025 at 09:27 AM
+-- Generation Time: Apr 30, 2025 at 02:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,12 +40,8 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`id`, `name`, `email`, `password`, `created_at`) VALUES
-(1, 'Admin', 'admin@hamrojob.com', 'Admin@123', '2025-03-18 11:41:44'),
-(3, 'Admin', 'admin1@hamrojob.com', 'Admin1@123', '2025-03-18 12:07:29'),
-(4, 'admin21', 'admin21@gmail.co', 'admin@12344', '2025-04-01 19:04:46'),
-(5, 'admin311', 'admin311@gmail.com', 'Admin@12344', '2025-04-01 19:06:15'),
-(6, 'Samir', 'samiradmin@gmail.com', 'samir21', '2025-04-01 19:11:21'),
-(7, 'dependra', 'dependra322@gmail.com', ' dependra322', '2025-04-09 03:39:33');
+(8, 'Samxtha', 'samxtha098@gmail.com', '$2b$10$Tcr1p/K2Xne.NiuzHGzAzOoRZr.pQwFQgRMb3lOYkq1MpJ4fPI47m', '2025-04-23 09:57:23'),
+(9, 'Admin', 'admin1@hamrojob.com', 'admin123', '2025-04-24 08:42:12');
 
 -- --------------------------------------------------------
 
@@ -73,7 +69,9 @@ CREATE TABLE `applications` (
 INSERT INTO `applications` (`id`, `job_id`, `user_id`, `resume`, `resume_public_id`, `cover_letter`, `status`, `created_at`, `updated_at`, `video_url`) VALUES
 (10, 23, 19, 'https://res.cloudinary.com/dfplmkziu/image/upload/v1745307845/CV_resume/resume_19_1745307843528.pdf', NULL, 'asdfasdfsdfs', 'pending', '2025-04-22 07:44:22', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745307847/video_resumes/video_19_1745307847838.mp4'),
 (14, 15, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745340927/CV_resume/resume_19_1745340928561.docx', NULL, 'gfhgfghfhgfhfhf', 'pending', '2025-04-22 16:55:46', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745340931/video_resumes/video_19_1745340930110.mp4'),
-(15, 17, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745374842/CV_resume/resume_19_1745374843606.docx', NULL, 'k;l;lll', 'pending', '2025-04-23 02:20:59', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745374845/video_resumes/video_19_1745374845244.mp4');
+(15, 17, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745374842/CV_resume/resume_19_1745374843606.docx', NULL, 'k;l;lll', 'pending', '2025-04-23 02:20:59', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745374845/video_resumes/video_19_1745374845244.mp4'),
+(16, 20, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745410788/CV_resume/resume_19_1745410787331.docx', NULL, 'hsdjfkjhassssssssssssssssss', 'pending', '2025-04-23 12:20:05', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745410791/video_resumes/video_19_1745410788862.mp4'),
+(17, 21, 21, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1746013736/CV_resume/resume_21_1746013737341.docx', NULL, 'dkfhakshfkjaskjfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhakslakslakslakslaksl', 'pending', '2025-04-30 11:49:18', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1746013739/video_resumes/video_21_1746013739580.mp4');
 
 -- --------------------------------------------------------
 
@@ -107,7 +105,7 @@ INSERT INTO `jobs` (`id`, `title`, `company`, `location`, `description`, `requir
 (17, 'Hr', 'Tech solution', 'Bhaktapur,Nepal', 'alsfjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj', 'asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.,,asdfffffffffffffffffffffffffffff,asdfffffffffffffffffffff', 'active', 1, 'internship', '2025-04-08 17:09:04', '2025-04-12 05:41:08', 'yes', 1),
 (18, 'Product maanaegr ', 'Hamro job', 'Lalitpur, Nepal', 'Job is to work for managing according to company policy ', 'Much   have a knowledge to do works and having 5 years experience in product company ', 'active', 1, 'job', '2025-04-11 10:35:10', '2025-04-11 16:19:14', 'yes', 1),
 (19, 'Software developer ', 'Hamro job', 'Software developer ', 'Software developer Software developer Software developer ', 'Software developer Software developer Software developer Software developer ', 'closed', 1, 'full-time', '2025-04-11 16:20:55', '2025-04-12 04:28:18', 'no', 1),
-(20, 'salaksjahsd', 'Hamro jobas', 'adasdgasgs', 'Hamro HaHamro jobasmro jobasHamro jobasHamro jobasjobasHamro jobas', 'Hamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobas', 'closed', 1, 'full-time', '2025-04-11 16:35:31', '2025-04-12 05:03:03', 'no', 1),
+(20, 'salaksjahsd', 'Hamro jobas', 'adas', 'Hamro HaHamro jobasmro jobasHamro jobasHamro jobasjobasHamro jobas', 'Hamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobasHamro jobas', 'active', 1, 'full-time', '2025-04-11 16:35:31', '2025-04-23 12:22:56', 'yes', 1),
 (21, 'Hotel manager ', 'Saliman Hotel', 'Putalisadak, Nepal', 'We are seeking a dedicated and experienced Hotel Manager to lead and oversee the daily operations of our hotel. The ideal candidate should be passionate about hospitality, possess excellent leadership skills, and ensure the highest standards of guest satisfaction. As a Hotel Manager, you will be responsible for managing staff, budgeting, marketing, and ensuring smooth and efficient operations of the hotel.\n\n', 'We are seeking a dedicated and experienced Hotel Manager to lead and oversee the daily operations of our hotel. The ideal candidate should be passionate about hospitality, possess excellent leadership skills, and ensure the highest standards of guest satisfaction. As a Hotel Manager, you will be responsible for managing staff, budgeting, marketing, and ensuring smooth and efficient operations of the hotel.\n\n', 'active', 1, 'full-time', '2025-04-11 16:43:50', '2025-04-12 05:41:28', 'yes', 1),
 (22, 'Frontend developer', 'Compa', 'Frontend developer', 'Frontend developerFrontend developerFrontend developerFrontend developer', 'Frontend developerFrontend developerFronte', 'active', 2, 'part-time', '2025-04-12 11:46:23', '2025-04-12 11:49:27', 'yes', 1),
 (23, 'Designer ', 'DOt net Designer ', 'Bhaktapur,Kathmandu', 'We are seeking a creative and detail-oriented Designer to join our team. The ideal candidate should have a strong eye for aesthetics and be passionate about creating visually appealing and user-friendly designs. You will work closely with our marketing, development, and product teams to bring ideas to life through design.', 'Proven experience as a designer (portfolio required)\n\nProficiency in tools like Adobe Creative Suite (Photoshop, Illustrator, XD, etc.), Figma, or Sketch\n\nStrong understanding of color theory, typography, and layout design\n\nGood communication and collaboration skills\n\nAbility to work independently and manage multiple projects', 'active', 2, 'Fulltime', '2025-04-22 07:41:23', '2025-04-22 19:26:08', 'yes', 1),
@@ -142,7 +140,9 @@ CREATE TABLE `payments` (
 
 INSERT INTO `payments` (`id`, `recruiter_id`, `amount`, `plan_type`, `job_id`, `payment_method`, `card_last_four`, `payment_status`, `transaction_id`, `payment_date`, `updated_at`, `job_posts_allowed`, `job_posts_used`, `expiry_date`) VALUES
 (39, 2, 1060.00, 'basic', NULL, 'esewa', NULL, 'success', 'manual-1745392379269-1vmckjn7', '2025-04-23 12:57:59', NULL, 1, 0, '2025-04-30'),
-(43, 3, 3160.00, 'premium', NULL, 'esewa', NULL, 'success', 'manual-1745385681512-hvaoyvcm', '2025-04-23 11:06:21', NULL, -1, 0, '2025-05-23');
+(43, 3, 2110.00, 'standard', NULL, 'esewa', NULL, 'success', 'manual-1745395634370-esvyaiw3', '2025-04-23 13:52:14', NULL, 3, 0, '2025-05-08'),
+(65, 1, 2110.00, 'basic', NULL, 'esewa', NULL, 'completed', '1745484187904', '2025-04-30 14:49:15', '2025-04-30 14:49:15', 1, 0, '2025-05-07'),
+(67, 4, 2110.00, 'standard', NULL, 'esewa', NULL, 'success', 'manual-1746013336236-gsyf1n31', '2025-04-30 17:27:16', '2025-04-30 17:27:16', 3, 0, '2025-05-15');
 
 -- --------------------------------------------------------
 
@@ -191,17 +191,19 @@ CREATE TABLE `recruiter` (
   `location` varchar(100) DEFAULT NULL,
   `bio` text DEFAULT NULL,
   `company_name` varchar(255) DEFAULT NULL,
-  `subscription_status` varchar(20) DEFAULT 'inactive'
+  `subscription_status` varchar(20) DEFAULT 'inactive',
+  `subscription_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `recruiter`
 --
 
-INSERT INTO `recruiter` (`id`, `username`, `email`, `password`, `role`, `status`, `profile_image`, `created_at`, `updated_at`, `phone`, `location`, `bio`, `company_name`, `subscription_status`) VALUES
-(1, 'Samir Shrestha', 'samirxtha098@gmail.com', '$2b$10$kUavxjE/AbR5R3YnBOToCeXfZ94YC6EixyoOf0c4kgeqVLmUlcAky', 'recruiter', 'active', NULL, '2025-04-07 15:59:35', '2025-04-23 07:17:58', NULL, NULL, NULL, 'Hamro job', 'inactive'),
-(2, 'sadikshya munankarmi', 'sadikshyamunankarmi7@gmail.com', '$2b$10$PILo8HTntC7pCG7nl2KfiuisyCws3WTSfQ/cjnPEW.jZ4js3becYS', 'recruiter', 'active', NULL, '2025-04-12 11:44:18', '2025-04-12 17:20:53', NULL, NULL, NULL, 'Compa', 'active'),
-(3, 'Nijal Shankar', 'np03cs4a220139@heraldcollege.edu.np', '$2b$10$8PeN9eQOBoV9zA146KxYtOqxWaqUqiKYd8APYENlGtavN1sqQnsIS', 'recruiter', 'active', NULL, '2025-04-12 12:13:55', '2025-04-12 12:45:25', NULL, NULL, NULL, 'Bajya', 'active');
+INSERT INTO `recruiter` (`id`, `username`, `email`, `password`, `role`, `status`, `profile_image`, `created_at`, `updated_at`, `phone`, `location`, `bio`, `company_name`, `subscription_status`, `subscription_id`) VALUES
+(1, 'Samir Shrestha', 'samirxtha098@gmail.com', '$2b$10$kUavxjE/AbR5R3YnBOToCeXfZ94YC6EixyoOf0c4kgeqVLmUlcAky', 'recruiter', 'active', NULL, '2025-04-07 15:59:35', '2025-04-23 07:30:14', NULL, NULL, NULL, 'Hamro job', 'active', NULL),
+(2, 'sadikshya munankarmi', 'sadikshyamunankarmi7@gmail.com', '$2b$10$PILo8HTntC7pCG7nl2KfiuisyCws3WTSfQ/cjnPEW.jZ4js3becYS', 'recruiter', 'active', NULL, '2025-04-12 11:44:18', '2025-04-12 17:20:53', NULL, NULL, NULL, 'Compa', 'active', NULL),
+(3, 'Nijal Shankar', 'np03cs4a220139@heraldcollege.edu.np', '$2b$10$8PeN9eQOBoV9zA146KxYtOqxWaqUqiKYd8APYENlGtavN1sqQnsIS', 'recruiter', 'active', NULL, '2025-04-12 12:13:55', '2025-04-12 12:45:25', NULL, NULL, NULL, 'Bajya', 'active', NULL),
+(4, 'sam stha', 'elegantsammet@ysosirius.com', '$2b$10$llNXkj5FyqOeAEOzqmcliOys7XWrsu8z5nDwpQ/tl8FGpylTKmgKu', 'recruiter', 'active', NULL, '2025-04-23 12:24:59', '2025-04-30 10:34:24', NULL, NULL, NULL, 'elegantsammet', 'active', NULL);
 
 -- --------------------------------------------------------
 
@@ -215,8 +217,8 @@ CREATE TABLE `recruiter_subscriptions` (
   `plan_type` varchar(50) NOT NULL,
   `expiry_date` date NOT NULL,
   `is_active` tinyint(1) DEFAULT 1,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime DEFAULT NULL
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -261,7 +263,8 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `status`, `p
 (19, 'Samir Shrestha', 'samirxtha098@gmail.com', '$2b$10$hv53eSiijRnQcY5YCWTcm.PI11IX9Vaaahdawgxdn0NRNE2tdIuf2', 'seeker', 'active', NULL, NULL, '2025-04-08 04:51:20', '2025-04-11 09:48:40', '9819721219', 'kathmandu nepal', 'i am student  and i am currently study in herald college located at naxal', 'Html,CSS,JS ,React '),
 (20, 'Sadikshya Munankarmi', 'sadikshyamunankarmi7@gmail.com', '$2b$10$gSIsRW5E1DQF3nWSg8CafeZQwCu9R91UptAIt1BYQlur1/BMnuRVG', 'seeker', 'active', NULL, NULL, '2025-04-11 09:54:01', '2025-04-11 09:56:45', '9861044040', 'Shrijananagar ,Bhaktapur', 'I am  sadikshya munankarmi . I am from bhaktapur', 'Html ,  Css, Js ,Php , My SQL\n'),
 (21, 'Sujal Basnet', 'sujal.basnet6002@gmail.com', '$2b$10$f/bjNVGXo9J1UZ8zMzzd4.b9xl9LeP29DgEpOEWaC885ftzVWQtOu', 'seeker', 'active', NULL, NULL, '2025-04-13 04:03:00', '2025-04-13 04:03:43', '98918928911', 'Kathmandu', 'lorem', 'alskjflkasjf,jadkahskg'),
-(22, 'samir shrestha', 'nostalgicchaum6@justzeus.com', '$2b$10$ww/Y7mYs/xByt2XVl0qe3O4MEvcW/GXOx2gyo0uV5XQifRCvupQ1u', 'seeker', 'active', NULL, NULL, '2025-04-13 05:01:57', NULL, NULL, NULL, NULL, NULL);
+(22, 'samir shrestha', 'nostalgicchaum6@justzeus.com', '$2b$10$ww/Y7mYs/xByt2XVl0qe3O4MEvcW/GXOx2gyo0uV5XQifRCvupQ1u', 'seeker', 'active', NULL, NULL, '2025-04-13 05:01:57', NULL, NULL, NULL, NULL, NULL),
+(23, 'thirstyyalow8txa', 'thirstyyalow8@tomorjerry.com', '$2b$10$BNlzbQpGJP8ydMW6kt.8zuBU6yTDHxlshQRhRSh9f7rASCHv0EFQi', 'seeker', 'active', NULL, NULL, '2025-04-23 10:06:39', NULL, NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -308,7 +311,8 @@ ALTER TABLE `payment_plans`
 -- Indexes for table `recruiter`
 --
 ALTER TABLE `recruiter`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_recruiter_subscription` (`subscription_id`);
 
 --
 -- Indexes for table `recruiter_subscriptions`
@@ -332,13 +336,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admin_users`
 --
 ALTER TABLE `admin_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `applications`
 --
 ALTER TABLE `applications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `jobs`
@@ -350,7 +354,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `payment_plans`
@@ -362,7 +366,7 @@ ALTER TABLE `payment_plans`
 -- AUTO_INCREMENT for table `recruiter`
 --
 ALTER TABLE `recruiter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `recruiter_subscriptions`
@@ -374,7 +378,7 @@ ALTER TABLE `recruiter_subscriptions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Constraints for dumped tables
@@ -399,6 +403,12 @@ ALTER TABLE `jobs`
 ALTER TABLE `payments`
   ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`recruiter_id`) REFERENCES `recruiter` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `recruiter`
+--
+ALTER TABLE `recruiter`
+  ADD CONSTRAINT `fk_recruiter_subscription` FOREIGN KEY (`subscription_id`) REFERENCES `recruiter_subscriptions` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `recruiter_subscriptions`

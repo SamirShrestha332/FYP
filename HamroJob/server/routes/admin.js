@@ -1,86 +1,195 @@
 import express from 'express';
-import { db } from '../config/db.js';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { db } from '../config/db.js';
 
 const router = express.Router();
 
-// Middleware to verify admin token
-const verifyAdminToken = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Access denied. No token provided.' });
+// Admin login
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    console.log('Admin login attempt:', { email });
+    
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email and password are required' 
+      });
     }
-
-    const token = authHeader.split(' ')[1];
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
-        req.admin = verified;
-        next();
-    } catch (error) {
-        res.status(400).json({ message: 'Invalid token' });
-    }
-};
+    
+    // Check if admin exists
+    const query = 'SELECT * FROM admin_users WHERE email = ?';
+    db.query(query, [email], async (err, results) => {
+      if (err) {
+        console.error('Admin login error:', err);
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Something went wrong, please try again.', 
+          error: err.message 
+        });
+      }
+      
+      if (results.length === 0) {
+        return res.status(401).json({ 
+          success: false, 
+          message: 'Invalid credentials' 
+        });
+      }
+      
+      const admin = results[0];
+      console.log('Admin found:', admin.email);
+      
+      // Compare password
+      let passwordMatch = false;
+      
+      // First try bcrypt compare for hashed passwords
+      try {
+        passwordMatch = await bcrypt.compare(password, admin.password);
+      } catch (e) {
+        // If bcrypt fails, it might be a plain text password (from your existing data)
+        passwordMatch = (password === admin.password);
+      }
+      
+      if (!passwordMatch) {
+        return res.status(401).json({ 
+          success: false, 
+          message: 'Invalid credentials' 
+        });
+      }
+      
+      // Create a simple token for authentication
+      const token = Math.random().toString(36).substring(2, 15) + 
+                    Math.random().toString(36).substring(2, 15);
+      
+      console.log('Admin login successful');
+      
+      // Return admin data
+      res.status(200).json({
+        success: true,
+        message: 'Login successful!',
+        admin: {
+          id: admin.id,
+          name: admin.name,
+          email: admin.email
+        },
+        token
+      });
+    });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error', 
+      error: error.message 
+    });
+  }
+});
 
 // Get dashboard stats
-router.get('/dashboard/stats', verifyAdminToken, async (req, res) => {
-    try {
-        // Get total users count
-        const [userRows] = await db.query('SELECT COUNT(*) as count FROM users');
-        const totalUsers = userRows[0].count;
+router.get('/dashboard/stats', async (req, res) => {
+  try {
+    // Get total users count
+    const userCountQuery = 'SELECT COUNT(*) as count FROM users';
+    
+    // Get total jobs count
+    const jobCountQuery = 'SELECT COUNT(*) as count FROM jobs';
+    
+    // Get active jobs count
+    const activeJobCountQuery = "SELECT COUNT(*) as count FROM jobs WHERE status = 'active'";
+    
+    // Get applications count
+    const applicationCountQuery = 'SELECT COUNT(*) as count FROM applications';
+    
+    // Execute queries
+    db.query(userCountQuery, (err, userResults) => {
+      if (err) {
+        console.error('Error fetching user count:', err);
+        return res.status(500).json({ success: false, message: 'Error fetching stats' });
+      }
+      
+      db.query(jobCountQuery, (err, jobResults) => {
+        if (err) {
+          console.error('Error fetching job count:', err);
+          return res.status(500).json({ success: false, message: 'Error fetching stats' });
+        }
         
-        // Get total jobs count
-        const [jobRows] = await db.query('SELECT COUNT(*) as count FROM jobs');
-        const totalJobs = jobRows[0].count;
-        
-        // Get active jobs count
-        const [activeJobRows] = await db.query('SELECT COUNT(*) as count FROM jobs WHERE status = "active"');
-        const activeJobs = activeJobRows[0].count;
-        
-        // Get applications count
-        const [applicationRows] = await db.query('SELECT COUNT(*) as count FROM applications');
-        const applications = applicationRows[0].count;
-        
-        res.json({
-            totalUsers,
-            totalJobs,
-            activeJobs,
-            applications
+        db.query(activeJobCountQuery, (err, activeJobResults) => {
+          if (err) {
+            console.error('Error fetching active job count:', err);
+            return res.status(500).json({ success: false, message: 'Error fetching stats' });
+          }
+          
+          db.query(applicationCountQuery, (err, applicationResults) => {
+            if (err) {
+              console.error('Error fetching application count:', err);
+              return res.status(500).json({ success: false, message: 'Error fetching stats' });
+            }
+            
+            // Return all stats
+            res.status(200).json({
+              success: true,
+              stats: {
+                totalUsers: userResults[0].count || 0,
+                totalJobs: jobResults[0].count || 0,
+                activeJobs: activeJobResults[0].count || 0,
+                applications: applicationResults[0].count || 0
+              }
+            });
+          });
         });
-    } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
 });
 
 // Get recent jobs
-router.get('/jobs/recent', verifyAdminToken, async (req, res) => {
-    try {
-        const [rows] = await db.query(
-            'SELECT * FROM jobs ORDER BY created_at DESC LIMIT 5'
-        );
-        
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching recent jobs:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+router.get('/dashboard/recent-jobs', async (req, res) => {
+  try {
+    const query = 'SELECT id, title, company, created_at as date FROM jobs ORDER BY created_at DESC LIMIT 5';
+    
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching recent jobs:', err);
+        return res.status(500).json({ success: false, message: 'Error fetching recent jobs' });
+      }
+      
+      res.status(200).json({
+        success: true,
+        recentJobs: results
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching recent jobs:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
 });
 
 // Get recent users
-router.get('/users/recent', verifyAdminToken, async (req, res) => {
-    try {
-        const [rows] = await db.query(
-            'SELECT * FROM users ORDER BY created_at DESC LIMIT 5'
-        );
-        
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching recent users:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
+router.get('/dashboard/recent-users', async (req, res) => {
+  try {
+    // First try to get from users table
+    const usersQuery = 'SELECT id, username as name, email, role, created_at as date FROM users ORDER BY created_at DESC LIMIT 5';
+    
+    db.query(usersQuery, (err, results) => {
+      if (err) {
+        console.error('Error fetching recent users:', err);
+        return res.status(500).json({ success: false, message: 'Error fetching recent users' });
+      }
+      
+      res.status(200).json({
+        success: true,
+        recentUsers: results
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching recent users:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
 });
-
-// Add more admin routes as needed
 
 export default router;

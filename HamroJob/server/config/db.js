@@ -60,15 +60,26 @@ const initializeDatabase = async () => {
         `);
         
         // Create admin_users table if it doesn't exist
-        db.query(`
-          CREATE TABLE IF NOT EXISTS admin_users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) NOT NULL,
-            email VARCHAR(100) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
+        const createAdminUsersTable = () => {
+          const query = `
+            CREATE TABLE IF NOT EXISTS admin_users (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              name VARCHAR(100) NOT NULL,
+              email VARCHAR(100) NOT NULL UNIQUE,
+              password VARCHAR(255) NOT NULL,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          `;
+          
+          db.query(query, (err) => {
+            if (err) {
+              console.error('Error creating admin_users table:', err);
+            } else {
+              console.log('admin_users table created or already exists');
+              createDefaultAdmin();
+            }
+          });
+        };
         
         // Check if admin user exists, if not create default admin
         db.query(`SELECT * FROM admin_users WHERE email = 'admin1@hamrojob.com'`, (err, results) => {
@@ -80,7 +91,7 @@ const initializeDatabase = async () => {
             // If no admin user exists, create one
             if (results.length === 0) {
                 const defaultAdmin = {
-                    username: 'Admin',
+                    name: 'Admin',
                     email: 'admin1@hamrojob.com',
                     password: 'admin123' // Simple password for testing
                 };

@@ -76,16 +76,17 @@ function AdminLogin() {
             setError('Please correct the errors in the form.');
             return;
         }
-
+    
         setLoading(true);
         setError(null);
-
+    
         try {
-            const response = await axios.post("http://localhost:5000/admin/login", {
+            // Updated endpoint URL to match your server route
+            const response = await axios.post("http://localhost:5000/api/admin/login", {
                 email,
                 password
             });
-
+    
             console.log("Full server response:", response);
             
             // Check for success in multiple possible formats
@@ -97,7 +98,7 @@ function AdminLogin() {
                 if (response.data.token) {
                     localStorage.setItem('adminToken', response.data.token);
                 }
-
+    
                 // Set success message
                 setModalMessage('Admin login successful!');
                 setModalIsOpen(true);

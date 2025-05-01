@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import './RecruiterStyles.css';
 import RecruiterHeader from './RecruiterHeader';
@@ -14,12 +14,15 @@ function RecruiterApplicants() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedJob, setSelectedJob] = useState('all');
   const [jobs, setJobs] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedApplicant, setSelectedApplicant] = useState(null);
 
   useEffect(() => {
     const fetchUserAndApplicants = async () => {
       try {
-        const userData = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
+        // Get recruiter-specific user data
+        const userData = localStorage.getItem('recruiterUser') || localStorage.getItem('user');
+        const token = localStorage.getItem('recruiterToken') || localStorage.getItem('token');
         
         if (!userData || !token) {
           navigate('/recruiter/login');
@@ -27,6 +30,13 @@ function RecruiterApplicants() {
         }
         
         const parsedUser = JSON.parse(userData);
+        
+        // Verify this is a recruiter account
+        if (parsedUser.role !== 'recruiter') {
+          navigate('/recruiter/login');
+          return;
+        }
+        
         setUser(parsedUser);
         
         // First fetch the recruiter's jobs
@@ -39,8 +49,9 @@ function RecruiterApplicants() {
           if (jobsResponse.data && jobsResponse.data.jobs) {
             setJobs(jobsResponse.data.jobs);
             
-            // Then fetch all applicants for this recruiter's jobs
+            // Then fetch all applications for this recruiter's jobs
             try {
+              // Updated endpoint to match your database structure
               const applicantsResponse = await axios.get(`http://localhost:5000/api/applications/recruiter/${parsedUser.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
               });
@@ -58,22 +69,22 @@ function RecruiterApplicants() {
             }
           } else {
             setJobs([]);
-            setError('You need to post jobs before you can see applicants.');
+            setError('No jobs found. Post a job to start receiving applications.');
           }
         } catch (jobsError) {
           console.error('Error fetching jobs:', jobsError);
-          setError('Failed to load your jobs. Please try again later.');
+          setError('Failed to load jobs. Please try again later.');
         }
-      } catch (err) {
-        console.error('Error loading user data:', err);
-        setError('Failed to load user data');
+      } catch (error) {
+        console.error('Error in RecruiterApplicants:', error);
+        setError('An unexpected error occurred. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchUserAndApplicants();
-  }, [navigate]);
+  }, [navigate, location]);
 
   // Add this function for mock data
   const loadMockData = () => {
@@ -81,27 +92,31 @@ function RecruiterApplicants() {
     const mockApplicants = [
       {
         id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
+        user_id: 21,
         job_id: 15,
+        username: 'Sujal Basnet',
+        email: 'sujal.basnet6002@gmail.com',
         job_title: 'Backend Developer',
         company: 'Hamro job',
-        status: 'new',
-        applied_date: '2025-04-10 14:30:00',
-        resume_url: '/resumes/john-doe-resume.pdf',
-        cover_letter: 'I am excited to apply for this position...'
+        status: 'pending',
+        created_at: '2025-04-10 14:30:00',
+        resume: 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1746013736/CV_resume/resume_21_1746013737341.docx',
+        cover_letter: 'I am excited to apply for this position...',
+        video_url: 'https://res.cloudinary.com/dfplmkziu/video/upload/v1746013739/video_resumes/video_21_1746013739580.mp4'
       },
       {
         id: 2,
-        name: 'Jane Smith',
-        email: 'jane@example.com',
+        user_id: 19,
         job_id: 16,
+        username: 'Samir Shrestha',
+        email: 'samirxtha098@gmail.com',
         job_title: 'Frontend developer',
         company: 'HIrely',
-        status: 'reviewed',
-        applied_date: '2025-04-11 09:15:00',
-        resume_url: '/resumes/jane-smith-resume.pdf',
-        cover_letter: 'I believe my skills in design...'
+        status: 'pending',
+        created_at: '2025-04-11 09:15:00',
+        resume: 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745374842/CV_resume/resume_19_1745374843606.docx',
+        cover_letter: 'I believe my skills in design...',
+        video_url: 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745374845/video_resumes/video_19_1745374845244.mp4'
       }
     ];
     
@@ -137,9 +152,11 @@ function RecruiterApplicants() {
 
   const updateApplicantStatus = async (applicantId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
+      // Use the correct token from localStorage
+      const token = localStorage.getItem('recruiterToken') || localStorage.getItem('token');
       
-      const response = await axios.put(`http://localhost:5000/api/applicants/${applicantId}/status`, 
+      // Updated endpoint to match your database structure
+      const response = await axios.put(`http://localhost:5000/api/applications/${applicantId}/status`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -156,6 +173,16 @@ function RecruiterApplicants() {
       console.error('Error updating applicant status:', error);
       setError('Failed to update applicant status. Please try again.');
     }
+  };
+
+  const openResumeModal = (applicant) => {
+    setSelectedApplicant(applicant);
+    setModalOpen(true);
+  };
+
+  const closeResumeModal = () => {
+    setModalOpen(false);
+    setSelectedApplicant(null);
   };
 
   if (loading) {
@@ -208,8 +235,8 @@ function RecruiterApplicants() {
               All
             </button>
             <button 
-              className={activeFilter === 'new' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('new')}
+              className={activeFilter === 'pending' ? 'filter-btn active' : 'filter-btn'} 
+              onClick={() => handleFilterChange('pending')}
             >
               New
             </button>
@@ -220,16 +247,10 @@ function RecruiterApplicants() {
               Reviewed
             </button>
             <button 
-              className={activeFilter === 'interviewed' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('interviewed')}
+              className={activeFilter === 'accepted' ? 'filter-btn active' : 'filter-btn'} 
+              onClick={() => handleFilterChange('accepted')}
             >
-              Interviewed
-            </button>
-            <button 
-              className={activeFilter === 'hired' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('hired')}
-            >
-              Hired
+              Accepted
             </button>
             <button 
               className={activeFilter === 'rejected' ? 'filter-btn active' : 'filter-btn'} 
@@ -268,7 +289,7 @@ function RecruiterApplicants() {
             {getFilteredApplicants().map(applicant => (
               <div className="applicant-card" key={applicant.id}>
                 <div className="applicant-header">
-                  <h3 className="applicant-name">{applicant.name}</h3>
+                  <h3 className="applicant-name">{applicant.username}</h3>
                   <div className={`applicant-status ${applicant.status}`}>
                     {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
                   </div>
@@ -276,8 +297,8 @@ function RecruiterApplicants() {
                 
                 <div className="applicant-details">
                   <p className="applicant-email">{applicant.email}</p>
-                  <p className="applicant-job">Applied for: {applicant.job_title}</p>
-                  <p className="applicant-date">Applied on: {formatDate(applicant.applied_date)}</p>
+                  <p className="applicant-job">Applied for: {applicant.job_title || jobs.find(job => job.id === applicant.job_id)?.title}</p>
+                  <p className="applicant-date">Applied on: {formatDate(applicant.created_at)}</p>
                 </div>
                 
                 <div className="cover-letter-preview">
@@ -286,7 +307,16 @@ function RecruiterApplicants() {
                 </div>
                 
                 <div className="applicant-actions">
-                  <button className="view-resume-btn">View Resume</button>
+                  <div className="resume-actions">
+                    <a href={applicant.resume} target="_blank" rel="noopener noreferrer" className="view-resume-btn">
+                      View Resume
+                    </a>
+                    {applicant.video_url && (
+                      <a href={applicant.video_url} target="_blank" rel="noopener noreferrer" className="view-video-btn">
+                        View Video
+                      </a>
+                    )}
+                  </div>
                   
                   <div className="status-update">
                     <h4>Update Status:</h4>
@@ -299,18 +329,11 @@ function RecruiterApplicants() {
                         Mark as Reviewed
                       </button>
                       <button 
-                        className={applicant.status === 'interviewed' ? 'active' : ''}
-                        onClick={() => updateApplicantStatus(applicant.id, 'interviewed')}
-                        disabled={applicant.status === 'interviewed'}
+                        className={applicant.status === 'accepted' ? 'active' : ''}
+                        onClick={() => updateApplicantStatus(applicant.id, 'accepted')}
+                        disabled={applicant.status === 'accepted'}
                       >
-                        Mark as Interviewed
-                      </button>
-                      <button 
-                        className={applicant.status === 'hired' ? 'active' : ''}
-                        onClick={() => updateApplicantStatus(applicant.id, 'hired')}
-                        disabled={applicant.status === 'hired'}
-                      >
-                        Hire
+                        Accept
                       </button>
                       <button 
                         className={applicant.status === 'rejected' ? 'active' : ''}
@@ -324,6 +347,67 @@ function RecruiterApplicants() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        
+        {modalOpen && selectedApplicant && (
+          <div className="resume-modal">
+            <div className="resume-modal-content">
+              <button className="close-modal" onClick={closeResumeModal}>×</button>
+              <h2>Application Details</h2>
+              
+              <div className="applicant-info">
+                <h3>{selectedApplicant.username}</h3>
+                <p>{selectedApplicant.email}</p>
+              </div>
+              
+              <div className="resume-container">
+                <iframe 
+                  src={selectedApplicant.resume} 
+                  title="Resume" 
+                  width="100%" 
+                  height="500px"
+                ></iframe>
+              </div>
+              
+              {selectedApplicant.video_url && (
+                <div className="video-container">
+                  <h3>Video Resume</h3>
+                  <video 
+                    src={selectedApplicant.video_url} 
+                    controls 
+                    width="100%" 
+                    height="300px"
+                  ></video>
+                </div>
+              )}
+              
+              <div className="cover-letter-full">
+                <h3>Cover Letter</h3>
+                <p>{selectedApplicant.cover_letter}</p>
+              </div>
+              
+              <div className="modal-actions">
+                <button 
+                  className={`status-btn ${selectedApplicant.status === 'reviewed' ? 'active' : ''}`}
+                  onClick={() => updateApplicantStatus(selectedApplicant.id, 'reviewed')}
+                >
+                  Mark as Reviewed
+                </button>
+                <button 
+                  className={`status-btn ${selectedApplicant.status === 'accepted' ? 'active' : ''}`}
+                  onClick={() => updateApplicantStatus(selectedApplicant.id, 'accepted')}
+                >
+                  Accept
+                </button>
+                <button 
+                  className={`status-btn ${selectedApplicant.status === 'rejected' ? 'active' : ''}`}
+                  onClick={() => updateApplicantStatus(selectedApplicant.id, 'rejected')}
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

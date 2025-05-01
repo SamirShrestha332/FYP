@@ -7,6 +7,7 @@ import adminRoutes from './routes/admin.js';
 import userRoutes from './routes/user.js';
 import jobRoutes from './routes/job.js';
 import applicationsRoutes from './routes/applications.js'; // Changed to ES module import
+import paymentRoutes from './routes/payment.js';
 
 // Initialize express app
 const app = express();
@@ -21,11 +22,12 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/', authRoutes);
 app.use('/api/recruiter', recruiterRoutes);
-app.use('/admin', adminRoutes);
+app.use('/api/admin', adminRoutes); // Changed from '/admin' to '/api/admin' to match frontend
 app.use('/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/job', jobRoutes); // Add this line to handle the job posting route
 app.use('/api/applications', applicationsRoutes); // Moved this up before starting the server
+app.use('/api/payment', paymentRoutes);
 
 // Add explicit redirection for job update endpoint
 app.put('/api/jobs/:id', (req, res) => {
@@ -48,19 +50,9 @@ app.post('/api/users/change-password', (req, res) => {
     res.redirect(307, '/users/change-password' + (req.query.email ? `?email=${req.query.email}` : ''));
 });
 
-// Add this with your other route imports
-import paymentRoutes from './routes/payment.js';
-
-// Add this with your other app.use statements
-app.use('/api/payment', paymentRoutes);
-
 // Start the server
 app.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
     await initializeDatabase();
 });
-// Add this to your existing imports
 
-
-// Add this to your existing app setup
-app.use('/api/admin', adminRoutes);
