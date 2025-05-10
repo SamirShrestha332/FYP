@@ -114,48 +114,85 @@ router.post('/recruiter', (req, res) => {
         });
     }
     
-    // First check if the recruiter exists in the recruiter table
-    db.query('SELECT id FROM recruiter WHERE id = ?', [recruiter_id], (err, recruiterResults) => {
-        if (err) {
-            console.error('Error checking recruiter:', err);
-            return res.status(500).json({ 
-                success: false,
-                message: 'Error checking recruiter', 
-                error: err.message 
-            });
-        }
-        
-        // If not found in recruiter table, check users table
-        if (recruiterResults.length === 0) {
-            db.query('SELECT id FROM users WHERE id = ? AND role = "recruiter"', [recruiter_id], (err, userResults) => {
+    // First check if the recruiter has an active subscription
+    db.query(
+        `SELECT r.id, r.subscription_status, p.job_posts_allowed, p.job_posts_used 
+         FROM recruiter r
+         LEFT JOIN payments p ON r.id = p.recruiter_id
+         WHERE r.id = ?`,
+        [recruiter_id],
+        (subscriptionErr, subscriptionResults) => {
+            if (subscriptionErr) {
+                console.error('Error checking subscription:', subscriptionErr);
+                return res.status(500).json({ 
+                    success: false,
+                    message: 'Error checking subscription', 
+                    error: subscriptionErr.message 
+                });
+            }
+            
+            // If no subscription found or inactive
+            if (subscriptionResults.length === 0 || subscriptionResults[0].subscription_status !== 'active') {
+                return res.status(403).json({ 
+                    success: false,
+                    message: 'You need an active subscription to post jobs' 
+                });
+            }
+            
+            // Check if recruiter has job posts remaining
+            const subscription = subscriptionResults[0];
+            if (subscription.job_posts_allowed !== -1 && 
+                subscription.job_posts_used >= subscription.job_posts_allowed) {
+                return res.status(403).json({ 
+                    success: false,
+                    message: 'You have used all your job posts. Please upgrade your plan.' 
+                });
+            }
+            
+            // Now check if the recruiter exists in the recruiter table
+            db.query('SELECT id FROM recruiter WHERE id = ?', [recruiter_id], (err, recruiterResults) => {
                 if (err) {
-                    console.error('Error checking user as recruiter:', err);
+                    console.error('Error checking recruiter:', err);
                     return res.status(500).json({ 
                         success: false,
-                        message: 'Error checking user as recruiter', 
+                        message: 'Error checking recruiter', 
                         error: err.message 
                     });
                 }
                 
-                if (userResults.length === 0) {
-                    console.error('No valid recruiter found with ID:', recruiter_id);
-                    return res.status(404).json({ 
-                        success: false,
-                        message: 'No valid recruiter found with the provided ID' 
+                // If not found in recruiter table, check users table
+                if (recruiterResults.length === 0) {
+                    db.query('SELECT id FROM users WHERE id = ? AND role = "recruiter"', [recruiter_id], (err, userResults) => {
+                        if (err) {
+                            console.error('Error checking user as recruiter:', err);
+                            return res.status(500).json({ 
+                                success: false,
+                                message: 'Error checking user as recruiter', 
+                                error: err.message 
+                            });
+                        }
+                        
+                        if (userResults.length === 0) {
+                            console.error('No valid recruiter found with ID:', recruiter_id);
+                            return res.status(404).json({ 
+                                success: false,
+                                message: 'No valid recruiter found with the provided ID' 
+                            });
+                        }
+                        
+                        // User exists as a recruiter, proceed with job creation
+                        insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
                     });
+                } else {
+                    // Recruiter exists in recruiter table, proceed with job creation
+                    insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
                 }
-                
-                // User exists as a recruiter, proceed with job creation
-                insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
             });
-        } else {
-            // Recruiter exists in recruiter table, proceed with job creation
-            insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
         }
-    });
+    );
 });
 
-// Helper function to insert job
+// Update the insertJob function to increment job_posts_used
 function insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type) {
     // Use job_type or default to 'job' if not provided
     const type = job_type || 'job';
@@ -182,6 +219,17 @@ function insertJob(req, res, title, company, location, description, requirements
                 error: err.message 
             });
         }
+        
+        // Increment job_posts_used in payments table
+        db.query(
+            'UPDATE payments SET job_posts_used = job_posts_used + 1 WHERE recruiter_id = ?',
+            [recruiter_id],
+            (updateErr) => {
+                if (updateErr) {
+                    console.error('Error updating job posts used count:', updateErr);
+                }
+            }
+        );
         
         res.status(201).json({ 
             success: true,
@@ -376,5 +424,63 @@ const fixJobVisibility = () => {
 
 // Call this function when the server starts
 fixJobVisibility();
+
+// Add this function to check subscription before creating a job
+function checkSubscription(recruiter_id, callback) {
+  db.query(
+    'SELECT * FROM payments WHERE recruiter_id = ? ORDER BY payment_date DESC LIMIT 1',
+    [recruiter_id],
+    (err, results) => {
+      if (err) {
+        return callback({ error: true, message: 'Database error', details: err.message });
+      }
+      
+      if (results.length === 0) {
+        return callback({ error: true, message: 'No active subscription found' });
+      }
+      
+      const payment = results[0];
+      
+      // Check if plan has expired
+      const today = new Date();
+      const expiryDate = new Date(payment.expiry_date);
+      
+      if (expiryDate < today) {
+        // Update recruiter status to inactive
+        db.query(
+          'UPDATE recruiter SET status = "inactive" WHERE id = ?',
+          [recruiter_id],
+          () => {}
+        );
+        return callback({ error: true, message: 'Subscription has expired' });
+      }
+      
+      // Check if user has used all job posts
+      if (payment.job_posts_allowed !== -1 && payment.job_posts_used >= payment.job_posts_allowed) {
+        return callback({ error: true, message: 'All job posts have been used' });
+      }
+      
+      return callback({ error: false, payment });
+    }
+  );
+}
+
+// Update your job creation route to use this check
+router.post('/create', async (req, res) => {
+  // ... existing code ...
+  
+  // Check subscription before creating job
+  checkSubscription(recruiter_id, (result) => {
+    if (result.error) {
+      return res.status(403).json({ 
+        success: false, 
+        message: result.message 
+      });
+    }
+    
+    // Continue with job creation
+    insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
+  });
+});
 
 export default router;

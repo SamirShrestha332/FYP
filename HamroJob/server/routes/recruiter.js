@@ -337,7 +337,7 @@ router.post('/payment-webhook', authenticateToken, async (req, res) => {
                 payment_method || 'esewa',
                 status || 'completed',
                 job_posts_allowed || 1,
-                0, // job_posts_used starts at 0
+                0,
                 expiryDateValue
               ];
             }
@@ -359,7 +359,7 @@ router.post('/payment-webhook', authenticateToken, async (req, res) => {
               // Update recruiter subscription status
               const updateRecruiterQuery = `
                 UPDATE recruiter 
-                SET subscription_status = 'active' 
+                SET status = 'active' 
                 WHERE id = ?
               `;
               

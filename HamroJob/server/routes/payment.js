@@ -60,7 +60,7 @@ router.post('/store', async (req, res) => {
               
               // Update recruiter subscription status
               db.query(
-                'UPDATE recruiter SET subscription_status = "active" WHERE id = ?',
+                'UPDATE recruiter SET status = "active" WHERE id = ?',
                 [recruiter_id],
                 (recruiterErr) => {
                   if (recruiterErr) {
@@ -112,7 +112,7 @@ router.post('/store', async (req, res) => {
               
               // Update recruiter subscription status
               db.query(
-                'UPDATE recruiter SET subscription_status = "active" WHERE id = ?',
+                'UPDATE recruiter SET status = "active" WHERE id = ?',
                 [recruiter_id],
                 (recruiterErr) => {
                   if (recruiterErr) {
@@ -173,6 +173,17 @@ router.post('/subscription', async (req, res) => {
                 return res.status(500).json({ success: false, message: 'Database error', error: updateErr.message });
               }
               
+              // Add this code to update the recruiter status
+              db.query(
+                'UPDATE recruiter SET status = ? WHERE id = ?',
+                [is_active ? 'active' : 'inactive', recruiter_id],
+                (linkErr) => {
+                  if (linkErr) {
+                    console.error('Recruiter link error:', linkErr);
+                  }
+                }
+              );
+              
               return res.json({ success: true, message: 'Subscription data updated successfully' });
             }
           );
@@ -191,6 +202,9 @@ router.post('/subscription', async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)
           `;
           
+          // In the subscription endpoint, you need to add code to update the recruiter status
+          
+          // Find this section in your subscription endpoint (around line 114-130)
           db.query(
             insertQuery, 
             [recruiter_id, plan_type, expiry_date, is_active, now, now], 
@@ -199,6 +213,17 @@ router.post('/subscription', async (req, res) => {
                 console.error('Subscription insert error:', insertErr);
                 return res.status(500).json({ success: false, message: 'Database error', error: insertErr.message });
               }
+              
+              // Add this code to update the recruiter status
+              db.query(
+                'UPDATE recruiter SET status = ? WHERE id = ?',
+                [is_active ? 'active' : 'inactive', recruiter_id],
+                (linkErr) => {
+                  if (linkErr) {
+                    console.error('Recruiter link error:', linkErr);
+                  }
+                }
+              );
               
               return res.json({ success: true, message: 'Subscription data saved successfully' });
             }
@@ -240,7 +265,7 @@ router.get('/plan/:recruiterId', async (req, res) => {
         if (expiryDate < today) {
           // Update recruiter subscription status
           db.query(
-            'UPDATE recruiter SET subscription_status = "inactive" WHERE id = ?',
+            'UPDATE recruiter SET status = "inactive" WHERE id = ?',
             [recruiterId],
             (updateErr) => {
               if (updateErr) {
@@ -269,4 +294,113 @@ router.get('/plan/:recruiterId', async (req, res) => {
   }
 });
 
+// Add a payment webhook endpoint to handle eSewa callbacks
+router.post('/payment-webhook', async (req, res) => {
+  try {
+    console.log('Payment webhook received:', req.body);
+    
+    const { oid, amt, refId, status } = req.body;
+    
+    if (!oid) {
+      return res.status(400).json({ success: false, message: 'Missing transaction ID' });
+    }
+    
+    // Find the payment record by transaction ID
+    db.query(
+      'SELECT * FROM payments WHERE transaction_id = ?',
+      [oid],
+      (err, results) => {
+        if (err) {
+          console.error('Error finding payment:', err);
+          return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        
+        if (results.length === 0) {
+          return res.status(404).json({ success: false, message: 'Payment not found' });
+        }
+        
+        const payment = results[0];
+        
+        // Update payment status
+        db.query(
+          'UPDATE payments SET payment_status = ?, reference_id = ? WHERE transaction_id = ?',
+          [status || 'completed', refId || '', oid],
+          (updateErr) => {
+            if (updateErr) {
+              console.error('Error updating payment status:', updateErr);
+              return res.status(500).json({ success: false, message: 'Error updating payment' });
+            }
+            
+            // Update recruiter status
+            db.query(
+              'UPDATE recruiter SET status = "active" WHERE id = ?',
+              [payment.recruiter_id],
+              (recruiterErr) => {
+                if (recruiterErr) {
+                  console.error('Error updating recruiter status:', recruiterErr);
+                }
+                
+                // Also update or create subscription record
+                const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                
+                // Check if subscription exists
+                db.query(
+                  'SELECT id FROM recruiter_subscriptions WHERE recruiter_id = ?',
+                  [payment.recruiter_id],
+                  (subCheckErr, subCheckResults) => {
+                    if (subCheckErr) {
+                      console.error('Subscription check error:', subCheckErr);
+                      return res.status(500).json({ success: false, message: 'Database error' });
+                    }
+                    
+                    if (subCheckResults.length > 0) {
+                      // Update existing subscription
+                      db.query(
+                        `UPDATE recruiter_subscriptions 
+                         SET plan_type = ?, expiry_date = ?, is_active = 1, updated_at = ? 
+                         WHERE recruiter_id = ?`,
+                        [payment.plan_type, payment.expiry_date, now, payment.recruiter_id],
+                        (subUpdateErr) => {
+                          if (subUpdateErr) {
+                            console.error('Subscription update error:', subUpdateErr);
+                          }
+                          
+                          return res.status(200).json({ 
+                            success: true, 
+                            message: 'Payment processed and subscription updated successfully' 
+                          });
+                        }
+                      );
+                    } else {
+                      // Create new subscription
+                      db.query(
+                        `INSERT INTO recruiter_subscriptions 
+                         (recruiter_id, plan_type, expiry_date, is_active, created_at, updated_at)
+                         VALUES (?, ?, ?, 1, ?, ?)`,
+                        [payment.recruiter_id, payment.plan_type, payment.expiry_date, now, now],
+                        (subInsertErr) => {
+                          if (subInsertErr) {
+                            console.error('Subscription insert error:', subInsertErr);
+                          }
+                          
+                          return res.status(200).json({ 
+                            success: true, 
+                            message: 'Payment processed and subscription created successfully' 
+                          });
+                        }
+                      );
+                    }
+                  }
+                );
+              }
+            );
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error('Payment webhook error:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
 export default router;

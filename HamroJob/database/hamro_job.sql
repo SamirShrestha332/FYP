@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 30, 2025 at 02:06 PM
+-- Generation Time: May 04, 2025 at 05:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,10 +68,10 @@ CREATE TABLE `applications` (
 
 INSERT INTO `applications` (`id`, `job_id`, `user_id`, `resume`, `resume_public_id`, `cover_letter`, `status`, `created_at`, `updated_at`, `video_url`) VALUES
 (10, 23, 19, 'https://res.cloudinary.com/dfplmkziu/image/upload/v1745307845/CV_resume/resume_19_1745307843528.pdf', NULL, 'asdfasdfsdfs', 'pending', '2025-04-22 07:44:22', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745307847/video_resumes/video_19_1745307847838.mp4'),
-(14, 15, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745340927/CV_resume/resume_19_1745340928561.docx', NULL, 'gfhgfghfhgfhfhf', 'pending', '2025-04-22 16:55:46', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745340931/video_resumes/video_19_1745340930110.mp4'),
-(15, 17, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745374842/CV_resume/resume_19_1745374843606.docx', NULL, 'k;l;lll', 'pending', '2025-04-23 02:20:59', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745374845/video_resumes/video_19_1745374845244.mp4'),
-(16, 20, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745410788/CV_resume/resume_19_1745410787331.docx', NULL, 'hsdjfkjhassssssssssssssssss', 'pending', '2025-04-23 12:20:05', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745410791/video_resumes/video_19_1745410788862.mp4'),
-(17, 21, 21, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1746013736/CV_resume/resume_21_1746013737341.docx', NULL, 'dkfhakshfkjaskjfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhakslakslakslakslaksl', 'pending', '2025-04-30 11:49:18', NULL, 'https://res.cloudinary.com/dfplmkziu/video/upload/v1746013739/video_resumes/video_21_1746013739580.mp4');
+(14, 15, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745340927/CV_resume/resume_19_1745340928561.docx', NULL, 'gfhgfghfhgfhfhf', 'reviewed', '2025-04-22 16:55:46', '2025-04-30 16:01:12', 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745340931/video_resumes/video_19_1745340930110.mp4'),
+(15, 17, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745374842/CV_resume/resume_19_1745374843606.docx', NULL, 'k;l;lll', 'rejected', '2025-04-23 02:20:59', '2025-04-30 12:14:34', 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745374845/video_resumes/video_19_1745374845244.mp4'),
+(16, 20, 19, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1745410788/CV_resume/resume_19_1745410787331.docx', NULL, 'hsdjfkjhassssssssssssssssss', 'reviewed', '2025-04-23 12:20:05', '2025-04-30 16:01:10', 'https://res.cloudinary.com/dfplmkziu/video/upload/v1745410791/video_resumes/video_19_1745410788862.mp4'),
+(17, 21, 21, 'https://res.cloudinary.com/dfplmkziu/raw/upload/v1746013736/CV_resume/resume_21_1746013737341.docx', NULL, 'dkfhakshfkjaskjfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhakslakslakslakslaksl', 'reviewed', '2025-04-30 11:49:18', '2025-04-30 12:14:38', 'https://res.cloudinary.com/dfplmkziu/video/upload/v1746013739/video_resumes/video_21_1746013739580.mp4');
 
 -- --------------------------------------------------------
 
@@ -139,9 +139,9 @@ CREATE TABLE `payments` (
 --
 
 INSERT INTO `payments` (`id`, `recruiter_id`, `amount`, `plan_type`, `job_id`, `payment_method`, `card_last_four`, `payment_status`, `transaction_id`, `payment_date`, `updated_at`, `job_posts_allowed`, `job_posts_used`, `expiry_date`) VALUES
-(39, 2, 1060.00, 'basic', NULL, 'esewa', NULL, 'success', 'manual-1745392379269-1vmckjn7', '2025-04-23 12:57:59', NULL, 1, 0, '2025-04-30'),
+(39, 2, 2110.00, 'standard', NULL, 'esewa', NULL, 'success', 'manual-1746028013815-i897bhx4', '2025-04-30 21:31:53', '2025-04-30 21:31:53', 3, 0, '2025-05-15'),
 (43, 3, 2110.00, 'standard', NULL, 'esewa', NULL, 'success', 'manual-1745395634370-esvyaiw3', '2025-04-23 13:52:14', NULL, 3, 0, '2025-05-08'),
-(65, 1, 2110.00, 'basic', NULL, 'esewa', NULL, 'completed', '1745484187904', '2025-04-30 14:49:15', '2025-04-30 14:49:15', 1, 0, '2025-05-07'),
+(65, 1, 2110.00, 'standard', NULL, 'esewa', NULL, 'success', 'manual-1746029060609-ilo92xqf', '2025-04-30 21:49:20', '2025-04-30 21:49:20', 3, 0, '2025-05-15'),
 (67, 4, 2110.00, 'standard', NULL, 'esewa', NULL, 'success', 'manual-1746013336236-gsyf1n31', '2025-04-30 17:27:16', '2025-04-30 17:27:16', 3, 0, '2025-05-15');
 
 -- --------------------------------------------------------
@@ -191,7 +191,6 @@ CREATE TABLE `recruiter` (
   `location` varchar(100) DEFAULT NULL,
   `bio` text DEFAULT NULL,
   `company_name` varchar(255) DEFAULT NULL,
-  `subscription_status` varchar(20) DEFAULT 'inactive',
   `subscription_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -199,11 +198,11 @@ CREATE TABLE `recruiter` (
 -- Dumping data for table `recruiter`
 --
 
-INSERT INTO `recruiter` (`id`, `username`, `email`, `password`, `role`, `status`, `profile_image`, `created_at`, `updated_at`, `phone`, `location`, `bio`, `company_name`, `subscription_status`, `subscription_id`) VALUES
-(1, 'Samir Shrestha', 'samirxtha098@gmail.com', '$2b$10$kUavxjE/AbR5R3YnBOToCeXfZ94YC6EixyoOf0c4kgeqVLmUlcAky', 'recruiter', 'active', NULL, '2025-04-07 15:59:35', '2025-04-23 07:30:14', NULL, NULL, NULL, 'Hamro job', 'active', NULL),
-(2, 'sadikshya munankarmi', 'sadikshyamunankarmi7@gmail.com', '$2b$10$PILo8HTntC7pCG7nl2KfiuisyCws3WTSfQ/cjnPEW.jZ4js3becYS', 'recruiter', 'active', NULL, '2025-04-12 11:44:18', '2025-04-12 17:20:53', NULL, NULL, NULL, 'Compa', 'active', NULL),
-(3, 'Nijal Shankar', 'np03cs4a220139@heraldcollege.edu.np', '$2b$10$8PeN9eQOBoV9zA146KxYtOqxWaqUqiKYd8APYENlGtavN1sqQnsIS', 'recruiter', 'active', NULL, '2025-04-12 12:13:55', '2025-04-12 12:45:25', NULL, NULL, NULL, 'Bajya', 'active', NULL),
-(4, 'sam stha', 'elegantsammet@ysosirius.com', '$2b$10$llNXkj5FyqOeAEOzqmcliOys7XWrsu8z5nDwpQ/tl8FGpylTKmgKu', 'recruiter', 'active', NULL, '2025-04-23 12:24:59', '2025-04-30 10:34:24', NULL, NULL, NULL, 'elegantsammet', 'active', NULL);
+INSERT INTO `recruiter` (`id`, `username`, `email`, `password`, `role`, `status`, `profile_image`, `created_at`, `updated_at`, `phone`, `location`, `bio`, `company_name`, `subscription_id`) VALUES
+(1, 'Samir Shrestha', 'samirxtha098@gmail.com', '$2b$10$kUavxjE/AbR5R3YnBOToCeXfZ94YC6EixyoOf0c4kgeqVLmUlcAky', 'recruiter', 'active', NULL, '2025-04-07 15:59:35', '2025-04-30 15:34:14', NULL, NULL, NULL, 'Hamro job', NULL),
+(2, 'sadikshya munankarmi', 'sadikshyamunankarmi7@gmail.com', '$2b$10$PILo8HTntC7pCG7nl2KfiuisyCws3WTSfQ/cjnPEW.jZ4js3becYS', 'recruiter', 'active', NULL, '2025-04-12 11:44:18', '2025-04-12 17:20:53', NULL, NULL, NULL, 'Compa', NULL),
+(3, 'Nijal Shankar', 'np03cs4a220139@heraldcollege.edu.np', '$2b$10$8PeN9eQOBoV9zA146KxYtOqxWaqUqiKYd8APYENlGtavN1sqQnsIS', 'recruiter', 'active', NULL, '2025-04-12 12:13:55', '2025-04-12 12:45:25', NULL, NULL, NULL, 'Bajya', NULL),
+(4, 'sam stha', 'elegantsammet@ysosirius.com', '$2b$10$llNXkj5FyqOeAEOzqmcliOys7XWrsu8z5nDwpQ/tl8FGpylTKmgKu', 'recruiter', 'active', NULL, '2025-04-23 12:24:59', '2025-04-30 10:34:24', NULL, NULL, NULL, 'elegantsammet', NULL);
 
 -- --------------------------------------------------------
 

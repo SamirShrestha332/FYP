@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { clearLocalStorage } from './Cleardata';
 import './RecruiterStyles.css';
 
 function RecruiterHeader() {
@@ -33,10 +34,8 @@ function RecruiterHeader() {
   };
 
   const handleLogout = () => {
-    // Clear recruiter-specific local storage
-    localStorage.removeItem('recruiterUser');
-    localStorage.removeItem('recruiterToken');
-    localStorage.removeItem('recruiterLoggedIn');
+    // Use the clearLocalStorage function to clear all user data
+    clearLocalStorage();
     
     // Redirect to login page
     navigate('/recruiter/login');

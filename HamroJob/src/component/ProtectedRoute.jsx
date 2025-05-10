@@ -24,7 +24,7 @@ const ProtectedRoute = ({ children }) => {
         setIsAuthenticated(true);
         setLoading(false);
         
-        // Then verify with the backend (but don't wait for this to complete)
+      
         try {
           const response = await axios.get('http://localhost:5000/api/users/verify', {
             headers: { Authorization: `Bearer ${token}` }
