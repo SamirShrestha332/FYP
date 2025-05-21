@@ -248,6 +248,7 @@ nav ul li a.active::after {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   background-color: white;
+  color: black;
   cursor: pointer;
   font-size: 0.9rem;
   text-align: left;
@@ -637,7 +638,10 @@ nav ul li a.active::after {
   .job-hero {
     padding: 2.5rem 4%;
   }
-  
+  .filter-button{
+    background-color: white;
+    color: #333;
+  }
   .job-content {
     padding: 2rem 4%;
   }

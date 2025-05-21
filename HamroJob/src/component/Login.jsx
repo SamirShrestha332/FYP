@@ -43,6 +43,8 @@ function Login() {
         const value = e.target.value;
         setEmail(value);
         validateEmail(value);
+        // Store email in localStorage for forgot password functionality
+        localStorage.setItem('lastLoginEmail', value);
     };
     
     const handlePasswordChange = (e) => {
@@ -151,7 +153,7 @@ function Login() {
                     </div>
                     
                     <div className="forgot-password">
-                        <Link to="/forgot-password">Forgot Password?</Link>
+                        <Link to="/forgot-password" state={{ email: email }}>Forgot Password?</Link>
                     </div>
                     
                     <button type="submit" className="submit-btn" disabled={loading}>

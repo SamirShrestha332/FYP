@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
-import './RecruiterStyles.css';
+import * as XLSX from 'xlsx';
+import './RecruiterApplicants.css';
 import RecruiterHeader from './RecruiterHeader';
 
 function RecruiterApplicants() {
@@ -185,6 +186,35 @@ function RecruiterApplicants() {
     setSelectedApplicant(null);
   };
 
+  // Function to export applicants to Excel
+  const exportToExcel = () => {
+    // Filter applicants based on current filters
+    const dataToExport = getFilteredApplicants().map(applicant => {
+      // Find the job title if not directly available
+      const jobTitle = applicant.job_title || jobs.find(job => job.id === applicant.job_id)?.title || 'Unknown Job';
+      
+      return {
+        'Name': applicant.username,
+        'Email': applicant.email,
+        'Job Applied For': jobTitle,
+        'Application Date': formatDate(applicant.created_at),
+        'Status': applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1),
+        'Cover Letter': applicant.cover_letter
+      };
+    });
+    
+    // Create worksheet from data
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    
+    // Create workbook and add the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Applicants');
+    
+    // Generate Excel file and trigger download
+    const fileName = `applicants_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+  };
+
   if (loading) {
     return (
       <div className="recruiter-dashboard">
@@ -204,212 +234,228 @@ function RecruiterApplicants() {
       <RecruiterHeader />
       
       <div className="dashboard-container">
-        <div className="welcome-section">
-          <h1>Applicants</h1>
-          <p>Review and manage job applications</p>
-        </div>
-        
-        <div className="applicants-filters">
-          <div className="filter-by-job">
-            <label htmlFor="job-filter">Filter by Job:</label>
-            <select 
-              id="job-filter" 
-              value={selectedJob} 
-              onChange={handleJobChange}
-              className="job-select"
-            >
-              <option value="all">All Jobs</option>
-              {jobs.map(job => (
-                <option key={job.id} value={job.id.toString()}>
-                  {job.title}
-                </option>
-              ))}
-            </select>
+        <div className="applicants-container">
+          <div className="applicants-header">
+            <div>
+              <h1 className="applicants-title">Applicants</h1>
+              <p>Review and manage job applications</p>
+            </div>
+            <button onClick={exportToExcel} className="export-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export to Excel
+            </button>
           </div>
           
-          <div className="status-filter-tabs">
-            <button 
-              className={activeFilter === 'all' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('all')}
-            >
-              All
-            </button>
-            <button 
-              className={activeFilter === 'pending' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('pending')}
-            >
-              New
-            </button>
-            <button 
-              className={activeFilter === 'reviewed' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('reviewed')}
-            >
-              Reviewed
-            </button>
-            <button 
-              className={activeFilter === 'accepted' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('accepted')}
-            >
-              Accepted
-            </button>
-            <button 
-              className={activeFilter === 'rejected' ? 'filter-btn active' : 'filter-btn'} 
-              onClick={() => handleFilterChange('rejected')}
-            >
-              Rejected
-            </button>
-          </div>
-        </div>
-        
-        {error && (
-          <div className="error-message">
-            {error}
-            <div className="error-actions">
-              <button onClick={() => window.location.reload()} className="retry-btn">Retry</button>
-              <button onClick={loadMockData} className="retry-btn">Load Sample Data</button>
+          <div className="applicants-filters">
+            <div className="filter-by-job">
+              <label htmlFor="job-filter">Filter by Job:</label>
+              <select 
+                id="job-filter" 
+                value={selectedJob} 
+                onChange={handleJobChange}
+                className="job-select"
+              >
+                <option value="all">All Jobs</option>
+                {jobs.map(job => (
+                  <option key={job.id} value={job.id.toString()}>
+                    {job.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="status-filter-tabs">
+              <button 
+                className={activeFilter === 'all' ? 'filter-btn active' : 'filter-btn'} 
+                onClick={() => handleFilterChange('all')}
+              >
+                All
+              </button>
+              <button 
+                className={activeFilter === 'pending' ? 'filter-btn active' : 'filter-btn'} 
+                onClick={() => handleFilterChange('pending')}
+              >
+                New
+              </button>
+              <button 
+                className={activeFilter === 'reviewed' ? 'filter-btn active' : 'filter-btn'} 
+                onClick={() => handleFilterChange('reviewed')}
+              >
+                Reviewed
+              </button>
+              <button 
+                className={activeFilter === 'accepted' ? 'filter-btn active' : 'filter-btn'} 
+                onClick={() => handleFilterChange('accepted')}
+              >
+                Accepted
+              </button>
+              <button 
+                className={activeFilter === 'rejected' ? 'filter-btn active' : 'filter-btn'} 
+                onClick={() => handleFilterChange('rejected')}
+              >
+                Rejected
+              </button>
             </div>
           </div>
-        )}
-        
-        {!error && getFilteredApplicants().length === 0 && (
-          <div className="no-applicants-container">
-            <div className="no-applicants-message">
-              {selectedJob !== 'all' 
-                ? `No ${activeFilter !== 'all' ? activeFilter : ''} applicants for this job.` 
-                : `No ${activeFilter !== 'all' ? activeFilter : ''} applicants found.`}
+          
+          {error && (
+            <div className="error-message">
+              {error}
+              <div className="error-actions">
+                <button onClick={() => window.location.reload()} className="retry-btn">Retry</button>
+                <button onClick={loadMockData} className="retry-btn">Load Sample Data</button>
+              </div>
             </div>
-            {jobs.length === 0 && (
-              <Link to="/recruiter/post-job" className="post-job-link">Post a New Job</Link>
-            )}
-          </div>
-        )}
-        
-        {getFilteredApplicants().length > 0 && (
-          <div className="applicants-grid">
-            {getFilteredApplicants().map(applicant => (
-              <div className="applicant-card" key={applicant.id}>
-                <div className="applicant-header">
-                  <h3 className="applicant-name">{applicant.username}</h3>
-                  <div className={`applicant-status ${applicant.status}`}>
-                    {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
-                  </div>
-                </div>
-                
-                <div className="applicant-details">
-                  <p className="applicant-email">{applicant.email}</p>
-                  <p className="applicant-job">Applied for: {applicant.job_title || jobs.find(job => job.id === applicant.job_id)?.title}</p>
-                  <p className="applicant-date">Applied on: {formatDate(applicant.created_at)}</p>
-                </div>
-                
-                <div className="cover-letter-preview">
-                  <h4>Cover Letter</h4>
-                  <p>{applicant.cover_letter.substring(0, 150)}...</p>
-                </div>
-                
-                <div className="applicant-actions">
-                  <div className="resume-actions">
-                    <a href={applicant.resume} target="_blank" rel="noopener noreferrer" className="view-resume-btn">
-                      View Resume
-                    </a>
-                    {applicant.video_url && (
-                      <a href={applicant.video_url} target="_blank" rel="noopener noreferrer" className="view-video-btn">
-                        View Video
-                      </a>
-                    )}
+          )}
+          
+          {!error && getFilteredApplicants().length === 0 && (
+            <div className="no-applicants-container">
+              <div className="no-applicants-message">
+                {selectedJob !== 'all' 
+                  ? `No ${activeFilter !== 'all' ? activeFilter : ''} applicants for this job.` 
+                  : `No ${activeFilter !== 'all' ? activeFilter : ''} applicants found.`}
+              </div>
+              {jobs.length === 0 && (
+                <Link to="/recruiter/post-job" className="post-job-link">Post a New Job</Link>
+              )}
+            </div>
+          )}
+          
+          {getFilteredApplicants().length > 0 && (
+            <div className="applicants-grid">
+              {getFilteredApplicants().map(applicant => (
+                <div className="applicant-card" key={applicant.id}>
+                  <div className="applicant-header">
+                    <h3 className="applicant-name">{applicant.username}</h3>
+                    <div className={`applicant-status ${applicant.status}`}>
+                      {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
+                    </div>
                   </div>
                   
-                  <div className="status-update">
-                    <h4>Update Status:</h4>
-                    <div className="status-buttons">
-                      <button 
-                        className={applicant.status === 'reviewed' ? 'active' : ''}
-                        onClick={() => updateApplicantStatus(applicant.id, 'reviewed')}
-                        disabled={applicant.status === 'reviewed'}
-                      >
-                        Mark as Reviewed
-                      </button>
-                      <button 
-                        className={applicant.status === 'accepted' ? 'active' : ''}
-                        onClick={() => updateApplicantStatus(applicant.id, 'accepted')}
-                        disabled={applicant.status === 'accepted'}
-                      >
-                        Accept
-                      </button>
-                      <button 
-                        className={applicant.status === 'rejected' ? 'active' : ''}
-                        onClick={() => updateApplicantStatus(applicant.id, 'rejected')}
-                        disabled={applicant.status === 'rejected'}
-                      >
-                        Reject
-                      </button>
+                  <div className="applicant-details">
+                    <p className="applicant-email"><i className="fas fa-envelope"></i> {applicant.email}</p>
+                    <p className="applicant-job"><i className="fas fa-briefcase"></i> Applied for: {applicant.job_title || jobs.find(job => job.id === applicant.job_id)?.title}</p>
+                    <p className="applicant-date"><i className="fas fa-calendar-alt"></i> Applied on: {formatDate(applicant.created_at)}</p>
+                  </div>
+                  
+                  <div className="cover-letter-preview">
+                    <h4>Cover Letter</h4>
+                    <p>{applicant.cover_letter.substring(0, 150)}...</p>
+                  </div>
+                  
+                  <div className="applicant-actions">
+                    <div className="resume-actions">
+                      <a href={applicant.resume} target="_blank" rel="noopener noreferrer" className="view-resume-btn">
+                        <i className="fas fa-file-alt"></i> View Resume
+                      </a>
+                      {applicant.video_url && (
+                        <a href={applicant.video_url} target="_blank" rel="noopener noreferrer" className="view-video-btn">
+                          <i className="fas fa-video"></i> View Video
+                        </a>
+                      )}
+                    </div>
+                    
+                    <div className="status-update">
+                      <h4>Update Status:</h4>
+                      <div className="status-buttons">
+                        <button 
+                          className={applicant.status === 'reviewed' ? 'active' : ''}
+                          onClick={() => updateApplicantStatus(applicant.id, 'reviewed')}
+                          disabled={applicant.status === 'reviewed'}
+                        >
+                          <i className="fas fa-check-circle"></i> Reviewed
+                        </button>
+                        <button 
+                          className={applicant.status === 'accepted' ? 'active' : ''}
+                          onClick={() => updateApplicantStatus(applicant.id, 'accepted')}
+                          disabled={applicant.status === 'accepted'}
+                        >
+                          <i className="fas fa-user-check"></i> Accept
+                        </button>
+                        <button 
+                          className={applicant.status === 'rejected' ? 'active' : ''}
+                          onClick={() => updateApplicantStatus(applicant.id, 'rejected')}
+                          disabled={applicant.status === 'rejected'}
+                        >
+                          <i className="fas fa-times-circle"></i> Reject
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {modalOpen && selectedApplicant && (
-          <div className="resume-modal">
-            <div className="resume-modal-content">
-              <button className="close-modal" onClick={closeResumeModal}>×</button>
-              <h2>Application Details</h2>
-              
-              <div className="applicant-info">
-                <h3>{selectedApplicant.username}</h3>
-                <p>{selectedApplicant.email}</p>
-              </div>
-              
-              <div className="resume-container">
-                <iframe 
-                  src={selectedApplicant.resume} 
-                  title="Resume" 
-                  width="100%" 
-                  height="500px"
-                ></iframe>
-              </div>
-              
-              {selectedApplicant.video_url && (
-                <div className="video-container">
-                  <h3>Video Resume</h3>
-                  <video 
-                    src={selectedApplicant.video_url} 
-                    controls 
-                    width="100%" 
-                    height="300px"
-                  ></video>
+              ))}
+            </div>
+          )}
+          
+          {modalOpen && selectedApplicant && (
+            <div className="resume-modal">
+              <div className="resume-modal-content">
+                <button className="close-modal" onClick={closeResumeModal}>×</button>
+                <h2>Application Details</h2>
+                
+                <div className="applicant-info">
+                  <h3><i className="fas fa-user"></i> {selectedApplicant.username}</h3>
+                  <p><i className="fas fa-envelope"></i> {selectedApplicant.email}</p>
+                  <p><i className="fas fa-briefcase"></i> Applied for: {selectedApplicant.job_title || jobs.find(job => job.id === selectedApplicant.job_id)?.title}</p>
+                  <p><i className="fas fa-calendar-alt"></i> Applied on: {formatDate(selectedApplicant.created_at)}</p>
+                  <p><i className="fas fa-tag"></i> Status: <span className={`modal-status ${selectedApplicant.status}`}>{selectedApplicant.status.charAt(0).toUpperCase() + selectedApplicant.status.slice(1)}</span></p>
                 </div>
-              )}
-              
-              <div className="cover-letter-full">
-                <h3>Cover Letter</h3>
-                <p>{selectedApplicant.cover_letter}</p>
-              </div>
-              
-              <div className="modal-actions">
-                <button 
-                  className={`status-btn ${selectedApplicant.status === 'reviewed' ? 'active' : ''}`}
-                  onClick={() => updateApplicantStatus(selectedApplicant.id, 'reviewed')}
-                >
-                  Mark as Reviewed
-                </button>
-                <button 
-                  className={`status-btn ${selectedApplicant.status === 'accepted' ? 'active' : ''}`}
-                  onClick={() => updateApplicantStatus(selectedApplicant.id, 'accepted')}
-                >
-                  Accept
-                </button>
-                <button 
-                  className={`status-btn ${selectedApplicant.status === 'rejected' ? 'active' : ''}`}
-                  onClick={() => updateApplicantStatus(selectedApplicant.id, 'rejected')}
-                >
-                  Reject
-                </button>
+                
+                <div className="resume-container">
+                  <h3><i className="fas fa-file-alt"></i> Resume</h3>
+                  <iframe 
+                    src={selectedApplicant.resume} 
+                    title="Resume" 
+                    width="100%" 
+                    height="500px"
+                  ></iframe>
+                </div>
+                
+                {selectedApplicant.video_url && (
+                  <div className="video-container">
+                    <h3><i className="fas fa-video"></i> Video Resume</h3>
+                    <video 
+                      src={selectedApplicant.video_url} 
+                      controls 
+                      width="100%" 
+                      height="300px"
+                    ></video>
+                  </div>
+                )}
+                
+                <div className="cover-letter-full">
+                  <h3><i className="fas fa-envelope-open-text"></i> Cover Letter</h3>
+                  <p>{selectedApplicant.cover_letter}</p>
+                </div>
+                
+                <div className="modal-actions">
+                  <button 
+                    className={`status-btn ${selectedApplicant.status === 'reviewed' ? 'active' : ''}`}
+                    onClick={() => updateApplicantStatus(selectedApplicant.id, 'reviewed')}
+                  >
+                    <i className="fas fa-check-circle"></i> Mark as Reviewed
+                  </button>
+                  <button 
+                    className={`status-btn ${selectedApplicant.status === 'accepted' ? 'active' : ''}`}
+                    onClick={() => updateApplicantStatus(selectedApplicant.id, 'accepted')}
+                  >
+                    <i className="fas fa-user-check"></i> Accept
+                  </button>
+                  <button 
+                    className={`status-btn ${selectedApplicant.status === 'rejected' ? 'active' : ''}`}
+                    onClick={() => updateApplicantStatus(selectedApplicant.id, 'rejected')}
+                  >
+                    <i className="fas fa-times-circle"></i> Reject
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

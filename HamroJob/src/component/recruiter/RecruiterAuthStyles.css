@@ -161,6 +161,58 @@
   text-decoration: underline;
 }
 
+.recruiter-resend-otp {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.recruiter-resend-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.recruiter-resend-btn:hover {
+  color: #2980b9;
+}
+
+.recruiter-resend-btn:disabled {
+  color: #95a5a6;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.modal-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.modal-status.pending {
+  background-color: #ebf8ff;
+  color: #3182ce;
+}
+
+.modal-status.reviewed {
+  background-color: #faf5ff;
+  color: #805ad5;
+}
+
+.modal-status.accepted {
+  background-color: #f0fff4;
+  color: #38a169;
+}
+
+.modal-status.rejected {
+  background-color: #fff5f5;
+  color: #e53e3e;
+}
+
 .recruiter-success-message, .recruiter-error-message {
   padding: 1rem;
   border-radius: 4px;

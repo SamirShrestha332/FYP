@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Signup from "./component/Signup";
 import Login from "./component/Login";
+import ForgotPassword from "./component/ForgotPassword";
 import Homepage from "./component/Homepage";
 import AdminLogin from "./component/admin/AdminLogin";
 import Dashboard from "./component/admin/Dashboard";
@@ -20,6 +21,7 @@ import "./component/admin/AdminStyles.css";
 import OTPVerification from './component/OTPVerification';
 import RecruiterSignup from './component/recruiter/RecruiterSignup';
 import RecruiterLogin from './component/recruiter/RecruiterLogin';
+import RecruiterForgotPassword from './component/recruiter/RecruiterForgotPassword';
 import RecruiterDashboard from './component/recruiter/RecruiterDashboard';
 import RecruiterJobs from './component/recruiter/RecruiterJobs';
 import RecruiterPostJob from './component/recruiter/RecruiterPostJob';
@@ -50,6 +52,7 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-otp" element={<OTPVerification />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/terms" element={<TermsOfService />} />
@@ -85,6 +88,7 @@ function App() {
         <Route path="/payment/failure" element={<Navigate to="/recruiter/payment" />} />
         <Route path="/recruiter/signup" element={<RecruiterSignup />} />
         <Route path="/recruiter/login" element={<RecruiterLogin />} />
+        <Route path="/recruiter/forgot-password" element={<RecruiterForgotPassword />} />
         <Route path="/recruiter/dashboard" element={
           <ProtectedRoute>
             <RecruiterDashboard />

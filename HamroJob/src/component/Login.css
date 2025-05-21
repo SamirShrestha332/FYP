@@ -141,6 +141,39 @@
   text-decoration: underline;
 }
 
+.resend-otp {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.resend-btn:hover {
+  color: #2980b9;
+}
+
+.resend-btn:disabled {
+  color: #95a5a6;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.success-message {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-left: 4px solid #2e7d32;
+}
+
 .error-message {
   padding: 1rem;
   border-radius: 4px;

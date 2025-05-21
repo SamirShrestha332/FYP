@@ -8,6 +8,8 @@ import userRoutes from './routes/user.js';
 import jobRoutes from './routes/job.js';
 import applicationsRoutes from './routes/applications.js'; // Changed to ES module import
 import paymentRoutes from './routes/payment.js';
+import passwordResetRoutes from './routes/password-reset.js';
+import recruiterPasswordResetRoutes from './routes/recruiter-password-reset.js';
 
 // Initialize express app
 const app = express();
@@ -28,6 +30,8 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/job', jobRoutes); // Add this line to handle the job posting route
 app.use('/api/applications', applicationsRoutes); // Moved this up before starting the server
 app.use('/api/payment', paymentRoutes);
+app.use('/api', passwordResetRoutes); // Password reset routes for regular users
+app.use('/api/recruiter', recruiterPasswordResetRoutes); // Password reset routes for recruiters
 
 // Add explicit redirection for job update endpoint
 app.put('/api/jobs/:id', (req, res) => {

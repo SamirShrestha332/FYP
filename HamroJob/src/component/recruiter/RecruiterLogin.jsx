@@ -43,6 +43,8 @@ function RecruiterLogin() {
         const value = e.target.value;
         setEmail(value);
         validateEmail(value);
+        // Store email in localStorage for forgot password functionality
+        localStorage.setItem('lastRecruiterEmail', value);
     };
     
     const handlePasswordChange = (e) => {
@@ -149,7 +151,7 @@ function RecruiterLogin() {
                     </div>
                     
                     <div className="recruiter-forgot-password">
-                        <Link to="/recruiter/forgot-password">Forgot Password?</Link>
+                        <Link to="/recruiter/forgot-password" state={{ email: email }}>Forgot Password?</Link>
                     </div>
                     
                     <button type="submit" className="submit-btn" disabled={loading}>
