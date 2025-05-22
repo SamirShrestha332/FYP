@@ -16,6 +16,8 @@ function Users() {
     useEffect(() => {
         // Check if admin is logged in
         const adminUser = localStorage.getItem('adminUser');
+        const token = localStorage.getItem('adminToken');
+        
         if (!adminUser) {
             navigate('/admin/login');
             return;
@@ -24,29 +26,22 @@ function Users() {
         // Fetch users data
         const fetchUsers = async () => {
             try {
-                // In a real app, you would fetch this data from your API
-                // For now, we'll use mock data
+                setLoading(true);
                 
-                // Mock data for demonstration
-                const mockUsers = [
-                    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'seeker', date: '2023-06-15', status: 'active' },
-                    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'recruiter', date: '2023-06-14', status: 'active' },
-                    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'seeker', date: '2023-06-13', status: 'inactive' },
-                    { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'seeker', date: '2023-06-12', status: 'active' },
-                    { id: 5, name: 'Charlie Wilson', email: 'charlie@example.com', role: 'recruiter', date: '2023-06-11', status: 'active' },
-                    { id: 6, name: 'Diana Miller', email: 'diana@example.com', role: 'seeker', date: '2023-06-10', status: 'inactive' },
-                    { id: 7, name: 'Edward Davis', email: 'edward@example.com', role: 'seeker', date: '2023-06-09', status: 'active' },
-                    { id: 8, name: 'Fiona Clark', email: 'fiona@example.com', role: 'recruiter', date: '2023-06-08', status: 'active' },
-                    { id: 9, name: 'George White', email: 'george@example.com', role: 'seeker', date: '2023-06-07', status: 'active' },
-                    { id: 10, name: 'Hannah Green', email: 'hannah@example.com', role: 'seeker', date: '2023-06-06', status: 'inactive' },
-                    { id: 11, name: 'Ian Black', email: 'ian@example.com', role: 'recruiter', date: '2023-06-05', status: 'active' },
-                    { id: 12, name: 'Julia Red', email: 'julia@example.com', role: 'seeker', date: '2023-06-04', status: 'active' }
-                ];
-
-                setUsers(mockUsers);
-                setLoading(false);
+                // Use the users/all endpoint directly as it's working correctly
+                const response = await axios.get('http://localhost:5000/users/all');
+                
+                if (response.data && response.data.success) {
+                    console.log('Fetched users successfully:', response.data.users.length);
+                    setUsers(response.data.users);
+                } else {
+                    console.error('Failed to fetch users:', response.data);
+                    setUsers([]);
+                }
             } catch (error) {
                 console.error('Error fetching users:', error);
+                setUsers([]);
+            } finally {
                 setLoading(false);
             }
         };
@@ -71,18 +66,55 @@ function Users() {
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const handleDeleteUser = (userId) => {
+    const handleDeleteUser = async (userId) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
-            // In a real app, you would send a delete request to your API
-            setUsers(users.filter(user => user.id !== userId));
+            try {
+                // Get token from localStorage
+                const token = localStorage.getItem('adminToken');
+                
+                // Send delete request to API
+                const response = await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                
+                if (response.data && response.data.success) {
+                    // Update local state to remove the deleted user
+                    setUsers(users.filter(user => user.id !== userId));
+                    alert('User deleted successfully!');
+                } else {
+                    alert('Failed to delete user: ' + (response.data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Error deleting user: ' + (error.response?.data?.message || error.message));
+            }
         }
     };
 
-    const handleStatusChange = (userId, newStatus) => {
-        // In a real app, you would send an update request to your API
-        setUsers(users.map(user => 
-            user.id === userId ? { ...user, status: newStatus } : user
-        ));
+    const handleStatusChange = async (userId, newStatus) => {
+        try {
+            // Get token from localStorage
+            const token = localStorage.getItem('adminToken');
+            
+            // Send update request to API
+            const response = await axios.put(`http://localhost:5000/api/admin/users/${userId}/status`, 
+                { status: newStatus },
+                { headers: { Authorization: `Bearer ${token}` }}
+            );
+            
+            if (response.data && response.data.success) {
+                // Update local state with the new status
+                setUsers(users.map(user => 
+                    user.id === userId ? { ...user, status: newStatus } : user
+                ));
+                console.log('User status updated successfully');
+            } else {
+                alert('Failed to update user status: ' + (response.data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error updating user status:', error);
+            alert('Error updating user status: ' + (error.response?.data?.message || error.message));
+        }
     };
 
     if (loading) {

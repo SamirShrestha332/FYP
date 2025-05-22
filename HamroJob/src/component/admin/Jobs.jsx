@@ -31,32 +31,62 @@ function Jobs() {
             return;
         }
 
-        // Fetch jobs data
+        // Fetch jobs data with application counts
         const fetchJobs = async () => {
             try {
-                //  fetch this data from your API
-                // For now,  use mock data
+                setLoading(true);
                 
-                // Mock data for demonstration
-                const mockJobs = [
-                    { id: 1, title: 'Frontend Developer', company: 'Tech Solutions', location: 'Kathmandu', status: 'active', date: '2023-06-15', applications: 12 },
-                    { id: 2, title: 'UX Designer', company: 'Creative Labs', location: 'Pokhara', status: 'active', date: '2023-06-14', applications: 8 },
-                    { id: 3, title: 'Project Manager', company: 'Global Systems', location: 'Kathmandu', status: 'closed', date: '2023-06-13', applications: 15 },
-                    { id: 4, title: 'Data Analyst', company: 'Data Insights', location: 'Biratnagar', status: 'active', date: '2023-06-12', applications: 5 },
-                    { id: 5, title: 'Backend Developer', company: 'Tech Solutions', location: 'Kathmandu', status: 'active', date: '2023-06-11', applications: 10 },
-                    { id: 6, title: 'Content Writer', company: 'Media Group', location: 'Pokhara', status: 'closed', date: '2023-06-10', applications: 7 },
-                    { id: 7, title: 'HR Manager', company: 'Corporate Services', location: 'Kathmandu', status: 'active', date: '2023-06-09', applications: 9 },
-                    { id: 8, title: 'Marketing Specialist', company: 'Brand Builders', location: 'Chitwan', status: 'active', date: '2023-06-08', applications: 6 },
-                    { id: 9, title: 'Full Stack Developer', company: 'Web Solutions', location: 'Kathmandu', status: 'active', date: '2023-06-07', applications: 14 },
-                    { id: 10, title: 'Customer Support', company: 'Service Center', location: 'Butwal', status: 'closed', date: '2023-06-06', applications: 4 },
-                    { id: 11, title: 'Network Engineer', company: 'IT Services', location: 'Kathmandu', status: 'active', date: '2023-06-05', applications: 3 },
-                    { id: 12, title: 'Graphic Designer', company: 'Creative Studios', location: 'Pokhara', status: 'active', date: '2023-06-04', applications: 11 }
-                ];
-
-                setJobs(mockJobs);
-                setLoading(false);
+                // Fetch job data with application counts
+                const response = await axios.get('http://localhost:5000/api/jobs/admin/with-applications');
+                
+                if (response.data && response.data.success) {
+                    console.log('Fetched jobs with application counts successfully:', response.data.jobs.length);
+                    
+                    // Format the job data to match the expected structure
+                    const formattedJobs = response.data.jobs.map(job => ({
+                        id: job.id,
+                        title: job.title,
+                        company: job.company,
+                        location: job.location,
+                        status: job.status || 'active',
+                        date: job.created_at,
+                        applications: job.application_count || 0
+                    }));
+                    
+                    setJobs(formattedJobs);
+                } else {
+                    console.error('Failed to fetch jobs:', response.data);
+                    setJobs([]);
+                }
             } catch (error) {
                 console.error('Error fetching jobs:', error);
+                // Fallback to regular jobs endpoint if the with-applications endpoint fails
+                try {
+                    const fallbackResponse = await axios.get('http://localhost:5000/api/jobs');
+                    
+                    if (fallbackResponse.data && fallbackResponse.data.jobs) {
+                        console.log('Fetched jobs (fallback) successfully:', fallbackResponse.data.jobs.length);
+                        
+                        // Format the job data to match the expected structure
+                        const formattedJobs = fallbackResponse.data.jobs.map(job => ({
+                            id: job.id,
+                            title: job.title,
+                            company: job.company,
+                            location: job.location,
+                            status: job.status || 'active',
+                            date: job.created_at,
+                            applications: 0 // Default value since we don't have application counts
+                        }));
+                        
+                        setJobs(formattedJobs);
+                    } else {
+                        setJobs([]);
+                    }
+                } catch (fallbackError) {
+                    console.error('Error in fallback fetch:', fallbackError);
+                    setJobs([]);
+                }
+            } finally {
                 setLoading(false);
             }
         };

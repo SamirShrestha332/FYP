@@ -178,7 +178,7 @@ function RecruiterDashboard() {
           </div>
         </div>
 
-        <div className="dashboard-content">
+        <div className="dashboard_content">
           <div className="content-section">
             <div className="section-header">
               <h2>Recent Jobs</h2>

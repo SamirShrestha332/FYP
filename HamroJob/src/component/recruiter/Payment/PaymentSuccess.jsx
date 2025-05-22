@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './PaymentStyles.css';
 import RecruiterHeader from '../RecruiterHeader';
-import { FaCheckCircle, FaArrowRight } from 'react-icons/fa';
+import { FaCheckCircle, FaArrowRight, FaFileInvoice, FaArrowLeft } from 'react-icons/fa';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -19,8 +19,17 @@ const PaymentSuccess = () => {
         
         // Get URL parameters from eSewa callback
         const params = new URLSearchParams(window.location.search);
-        const transactionId = params.get('transaction_uuid') || params.get('oid');
-        const status = params.get('status') || 'success';
+        // Try multiple possible parameter names for transaction ID
+        const transactionId = params.get('transaction_uuid') || 
+                             params.get('oid') || 
+                             params.get('refId') || 
+                             localStorage.getItem('lastPaymentTransaction') || 
+                             `TXN-${Date.now()}`; // Generate a fallback ID if none found
+        
+        console.log('Transaction ID captured:', transactionId);
+        
+        // Always use 'completed' status to match admin payment management terminology
+        const status = 'completed';
         const totalAmount = params.get('total_amount');
         
         // Get user data from localStorage
@@ -94,7 +103,7 @@ const PaymentSuccess = () => {
             amount: plan.amount + plan.tax + 10, // Add service charge
             plan_type: selectedPlan,
             payment_method: 'esewa',
-            status: status,
+            status: 'completed', // Always use 'completed' status to match admin panel
             job_posts_allowed: plan.job_posts,
             validity_days: plan.validity_days,
             expiry_date: expiryDate.toISOString().split('T')[0]
@@ -234,7 +243,7 @@ const PaymentSuccess = () => {
                 </div>
                 <div className="detail-row">
                   <span>Transaction ID:</span>
-                  <span>{paymentDetails.transactionId}</span>
+                  <span>{paymentDetails.transactionId || 'Not available'}</span>
                 </div>
                 <div className="detail-row">
                   <span>Valid Until:</span>
@@ -248,6 +257,12 @@ const PaymentSuccess = () => {
             )}
             
             <div className="success-actions">
+              <button 
+                onClick={() => navigate(`/recruiter/payment/invoice/${paymentDetails?.transactionId}`)}
+                className="invoice-button"
+              >
+                <FaFileInvoice /> View Invoice
+              </button>
               <button onClick={handleContinue} className="continue-button">
                 Post a Job Now <FaArrowRight />
               </button>

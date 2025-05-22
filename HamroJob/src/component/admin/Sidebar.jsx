@@ -48,43 +48,18 @@ function Sidebar() {
                 <button 
                     className="sidebar-toggle-btn" 
                     onClick={toggleSidebar}
-                    style={{
-                        position: 'fixed',
-                        top: '15px',
-                        left: isOpen ? '260px' : '15px',
-                        zIndex: 1001,
-                        background: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '8px 12px',
-                        cursor: 'pointer',
-                        transition: 'left 0.3s ease',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-                    }}
                 >
-                    <ion-icon name={isOpen ? "close-outline" : "menu-outline"}></ion-icon>
+                    {isOpen ? '×' : '☰'}
                 </button>
             )}
             
             {isMobile && isOpen && (
-                <div 
-                    onClick={handleOverlayClick}
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 999
-                    }}
-                ></div>
+                <div className="sidebar-overlay" onClick={handleOverlayClick}></div>
             )}
             
-            <div className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
+            <div className={`admin-sidebar ${isOpen ? 'open' : 'closed'}`}>
                 <div className="sidebar-header">
-                    <img src="/src/assets/Logo.png" alt="HamroJob Logo" className="sidebar-logo" />
+                    <img src="/logo.png" alt="HamroJob Logo" className="sidebar-logo" />
                     <h3>Admin Panel</h3>
                 </div>
                 
@@ -92,31 +67,38 @@ function Sidebar() {
                     <ul>
                         <li className={isActive('/admin/dashboard') ? 'active' : ''}>
                             <Link to="/admin/dashboard">
-                                <ion-icon name="grid-outline"></ion-icon>
+                                <i className="fas fa-tachometer-alt"></i>
                                 <span>Dashboard</span>
                             </Link>
                         </li>
                         <li className={isActive('/admin/users') ? 'active' : ''}>
                             <Link to="/admin/users">
-                                <ion-icon name="people-outline"></ion-icon>
+                                <i className="fas fa-users"></i>
                                 <span>Users</span>
                             </Link>
                         </li>
                         <li className={isActive('/admin/jobs') ? 'active' : ''}>
                             <Link to="/admin/jobs">
-                                <ion-icon name="briefcase-outline"></ion-icon>
+                                <i className="fas fa-briefcase"></i>
                                 <span>Jobs</span>
                             </Link>
                         </li>
                         <li className={isActive('/admin/applications') ? 'active' : ''}>
                             <Link to="/admin/applications">
-                                <ion-icon name="document-text-outline"></ion-icon>
+                                <i className="fas fa-file-alt"></i>
                                 <span>Applications</span>
+                            </Link>
+                        </li>
+                        {/* New Payment Section */}
+                        <li className={isActive('/admin/payments') ? 'active' : ''}>
+                            <Link to="/admin/payments">
+                                <i className="fas fa-credit-card"></i>
+                                <span>Payments</span>
                             </Link>
                         </li>
                         <li className={isActive('/admin/settings') ? 'active' : ''}>
                             <Link to="/admin/settings">
-                                <ion-icon name="settings-outline"></ion-icon>
+                                <i className="fas fa-cog"></i>
                                 <span>Settings</span>
                             </Link>
                         </li>
@@ -124,7 +106,7 @@ function Sidebar() {
                 </nav>
                 
                 <div className="sidebar-footer">
-                    <p>&copy; 2023 HamroJob</p>
+                    <p>© 2023 HamroJob</p>
                 </div>
             </div>
         </>

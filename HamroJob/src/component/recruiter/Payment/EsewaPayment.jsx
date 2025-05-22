@@ -163,7 +163,7 @@ const EsewaPayment = () => {
                             amount: paymentPlan.amount,     // Changed from total_amount to amount
                             plan_type: selectedPlan,
                             payment_method: 'esewa',
-                            status: 'completed',
+                            status: 'completed', // Consistently using 'completed' status to match admin panel
                             job_posts_allowed: plans[selectedPlan].job_posts,
                             validity_days: plans[selectedPlan].validity_days,
                             expiry_date: expiryDate.toISOString().split('T')[0]

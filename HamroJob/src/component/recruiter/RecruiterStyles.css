@@ -1178,7 +1178,7 @@
 }
 
 /* Dashboard Content */
-.dashboard-content {
+.dashboard_content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
@@ -1501,7 +1501,7 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .dashboard-content {
+  .dashboard_content {
     grid-template-columns: 1fr;
   }
 }

@@ -9,6 +9,7 @@ import Dashboard from "./component/admin/Dashboard";
 import Users from "./component/admin/Users";
 import Jobs from "./component/admin/Jobs";
 import Applications from "./component/admin/Applications";
+import Payments from "./component/admin/Payments";
 import Settings from "./component/admin/Settings";
 import UserProfile from "./component/UserProfile";
 import UserSettings from "./component/UserSettings";
@@ -38,7 +39,10 @@ import Esewapayment from './component/recruiter/Payment/EsewaPayment.jsx';
 import ProtectedJobRoute from './component/recruiter/ProtectedJobRoute';
 
 import PaymentSuccess from './component/recruiter/Payment/PaymentSuccess';
+import PaymentInvoice from './component/recruiter/Payment/PaymentInvoice';
 import ApplicationDetails from './component/ApplicationDetails';
+// Add this import at the top with your other imports
+
 
 function App() {
   return (
@@ -80,6 +84,11 @@ function App() {
         <Route path="/recruiter/payment/success" element={
           <ProtectedRoute>
             <PaymentSuccess />
+          </ProtectedRoute>
+        } />
+        <Route path="/recruiter/payment/invoice/:transactionId" element={
+          <ProtectedRoute>
+            <PaymentInvoice />
           </ProtectedRoute>
         } />
         <Route path="/payment/success" element={
@@ -182,6 +191,7 @@ function App() {
         <Route path="/admin/users" element={<Users />} />
         <Route path="/admin/jobs" element={<Jobs />} />
         <Route path="/admin/applications" element={<Applications />} />
+        <Route path="/admin/payments" element={<Payments />} />
         <Route path="/admin/settings" element={<Settings />} />
         {/* Application route - Protected so only logged in users can apply */}
         <Route path="/apply/:jobId" element={
@@ -189,6 +199,7 @@ function App() {
             <JobApplicationPage />
           </ProtectedRoute>
         } />
+   
       </Routes>
     </Router>
     

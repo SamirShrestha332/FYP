@@ -24,28 +24,42 @@ function Applications() {
         // Fetch applications data
         const fetchApplications = async () => {
             try {
+                setLoading(true);
+                const token = localStorage.getItem('adminToken');
                 
+                // Fetch real application data from our API
+                console.log('Fetching applications with token:', token ? 'Token exists' : 'No token');
+                const response = await axios.get('http://localhost:5000/api/applications/admin/all');
                 
-                // Mock data for demonstration
-                const mockApplications = [
-                    { id: 1, jobTitle: 'Frontend Developer', company: 'Tech Solutions', applicant: 'John Doe', date: '2023-06-15', status: 'pending' },
-                    { id: 2, jobTitle: 'UX Designer', company: 'Creative Labs', applicant: 'Jane Smith', date: '2023-06-14', status: 'reviewed' },
-                    { id: 3, jobTitle: 'Project Manager', company: 'Global Systems', applicant: 'Bob Johnson', date: '2023-06-13', status: 'accepted' },
-                    { id: 4, jobTitle: 'Data Analyst', company: 'Data Insights', applicant: 'Alice Brown', date: '2023-06-12', status: 'rejected' },
-                    { id: 5, jobTitle: 'Backend Developer', company: 'Tech Solutions', applicant: 'Charlie Wilson', date: '2023-06-11', status: 'pending' },
-                    { id: 6, jobTitle: 'Content Writer', company: 'Media Group', applicant: 'Diana Miller', date: '2023-06-10', status: 'reviewed' },
-                    { id: 7, jobTitle: 'HR Manager', company: 'Corporate Services', applicant: 'Edward Davis', date: '2023-06-09', status: 'accepted' },
-                    { id: 8, jobTitle: 'Marketing Specialist', company: 'Brand Builders', applicant: 'Fiona Clark', date: '2023-06-08', status: 'pending' },
-                    { id: 9, jobTitle: 'Full Stack Developer', company: 'Web Solutions', applicant: 'George White', date: '2023-06-07', status: 'reviewed' },
-                    { id: 10, jobTitle: 'Customer Support', company: 'Service Center', applicant: 'Hannah Green', date: '2023-06-06', status: 'rejected' },
-                    { id: 11, jobTitle: 'Network Engineer', company: 'IT Services', applicant: 'Ian Black', date: '2023-06-05', status: 'pending' },
-                    { id: 12, jobTitle: 'Graphic Designer', company: 'Creative Studios', applicant: 'Julia Red', date: '2023-06-04', status: 'accepted' }
-                ];
-
-                setApplications(mockApplications);
-                setLoading(false);
+                // Log the response for debugging
+                console.log('API Response:', response.data);
+                
+                if (response.data && response.data.success) {
+                    console.log('Fetched applications successfully:', response.data.applications.length);
+                    
+                    // Format the applications data to match component requirements
+                    const formattedApplications = response.data.applications.map(app => ({
+                        id: app.id,
+                        jobTitle: app.job_title,
+                        company: app.company,
+                        applicant: app.applicant_name,
+                        email: app.applicant_email,
+                        date: new Date(app.created_at).toISOString().split('T')[0],
+                        status: app.status,
+                        resume: app.resume,
+                        video: app.video_url,
+                        coverLetter: app.cover_letter
+                    }));
+                    
+                    setApplications(formattedApplications);
+                } else {
+                    console.error('Failed to fetch applications:', response.data);
+                    setApplications([]);
+                }
             } catch (error) {
                 console.error('Error fetching applications:', error);
+                setApplications([]);
+            } finally {
                 setLoading(false);
             }
         };
@@ -74,10 +88,29 @@ function Applications() {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // Handle status change
-    const handleStatusChange = (id, newStatus) => {
-        setApplications(applications.map(app => 
-            app.id === id ? { ...app, status: newStatus } : app
-        ));
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            
+            // Call the API to update application status
+            const response = await axios.put(`http://localhost:5000/api/applications/${id}/status`, 
+                { status: newStatus },
+                { headers: { Authorization: `Bearer ${token}` }}
+            );
+            
+            if (response.data && response.data.success) {
+                console.log(`Successfully updated application ${id} status to ${newStatus}`);
+                
+                // Update local state to reflect the change
+                setApplications(applications.map(app => 
+                    app.id === id ? { ...app, status: newStatus } : app
+                ));
+            } else {
+                console.error('Failed to update application status:', response.data);
+            }
+        } catch (error) {
+            console.error('Error updating application status:', error);
+        }
     };
 
     if (loading) {

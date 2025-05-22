@@ -33,65 +33,93 @@ function Dashboard() {
                 setLoading(true);
                 setError(null);
                 
-                // Fetch stats from API
-                const statsResponse = await axios.get('http://localhost:5000/api/admin/dashboard/stats', {
-                    headers: { Authorization: `Bearer ${token}` }
-                }).catch(err => {
-                    console.error('Error fetching stats:', err);
+                // Fetch users from API
+                const usersResponse = await axios.get('http://localhost:5000/users/all').catch(err => {
+                    console.error('Error fetching users:', err);
                     return null;
                 });
                 
-                // Fetch recent jobs
-                const jobsResponse = await axios.get('http://localhost:5000/api/admin/dashboard/recent-jobs', {
-                    headers: { Authorization: `Bearer ${token}` }
-                }).catch(err => {
-                    console.error('Error fetching recent jobs:', err);
+                // Fetch jobs from API
+                const jobsResponse = await axios.get('http://localhost:5000/api/jobs').catch(err => {
+                    console.error('Error fetching jobs:', err);
                     return null;
                 });
                 
-                // Fetch recent users
-                const usersResponse = await axios.get('http://localhost:5000/api/admin/dashboard/recent-users', {
+                // Fetch applications from API
+                const applicationsResponse = await axios.get('http://localhost:5000/api/admin/applications', {
                     headers: { Authorization: `Bearer ${token}` }
                 }).catch(err => {
-                    console.error('Error fetching recent users:', err);
+                    console.error('Error fetching applications:', err);
                     return null;
                 });
                 
-                // Update state with fetched data or fallback to mock data if API fails
-                if (statsResponse && statsResponse.data && statsResponse.data.success) {
-                    setStats(statsResponse.data.stats);
-                } else {
-                    // Fallback to mock data
-                    setStats({
-                        totalUsers: 120,
-                        totalJobs: 45,
-                        activeJobs: 32,
-                        applications: 78
-                    });
-                }
-                
-                if (jobsResponse && jobsResponse.data && jobsResponse.data.success) {
-                    setRecentJobs(jobsResponse.data.recentJobs);
-                } else {
-                    // Fallback to mock data
-                    setRecentJobs([
-                        { id: 1, title: 'Frontend Developer', company: 'Tech Solutions', date: '2023-06-15' },
-                        { id: 2, title: 'UX Designer', company: 'Creative Labs', date: '2023-06-14' },
-                        { id: 3, title: 'Project Manager', company: 'Global Systems', date: '2023-06-13' },
-                        { id: 4, title: 'Data Analyst', company: 'Data Insights', date: '2023-06-12' }
-                    ]);
-                }
-                
+                // Process the fetched data
+                // Process users data
                 if (usersResponse && usersResponse.data && usersResponse.data.success) {
-                    setRecentUsers(usersResponse.data.recentUsers);
+                    const users = usersResponse.data.users || [];
+                    console.log('Fetched users:', users.length);
+                    
+                    // Update stats with user count
+                    setStats(prevStats => ({
+                        ...prevStats,
+                        totalUsers: users.length
+                    }));
+                    
+                    // Get most recent users (limit to 4)
+                    const sortedUsers = [...users].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+                    setRecentUsers(sortedUsers);
                 } else {
-                    // Fallback to mock data
-                    setRecentUsers([
-                        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'seeker', date: '2023-06-15' },
-                        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'recruiter', date: '2023-06-14' },
-                        { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'seeker', date: '2023-06-13' },
-                        { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'seeker', date: '2023-06-12' }
-                    ]);
+                    // Fallback for users
+                    console.error('Failed to fetch users');
+                    setRecentUsers([]);
+                }
+                
+                // Process jobs data
+                if (jobsResponse && jobsResponse.data && jobsResponse.data.jobs) {
+                    const jobs = jobsResponse.data.jobs || [];
+                    console.log('Fetched jobs:', jobs.length);
+                    
+                    // Calculate job stats
+                    const activeJobs = jobs.filter(job => job.status === 'active').length;
+                    
+                    // Calculate total applications from job data
+                    const totalApplications = jobs.reduce((sum, job) => sum + (parseInt(job.applications) || 0), 0);
+                    console.log('Total applications calculated from jobs:', totalApplications);
+                    
+                    // Update stats
+                    setStats(prevStats => ({
+                        ...prevStats,
+                        totalJobs: jobs.length,
+                        activeJobs: activeJobs,
+                        applications: totalApplications
+                    }));
+                    
+                    // Get most recent jobs (limit to 4)
+                    const sortedJobs = [...jobs].sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at)).slice(0, 4);
+                    setRecentJobs(sortedJobs);
+                } else {
+                    // Fallback for jobs
+                    console.error('Failed to fetch jobs');
+                    setRecentJobs([]);
+                }
+                
+                // Process applications data
+                if (applicationsResponse && applicationsResponse.data && applicationsResponse.data.success) {
+                    const applications = applicationsResponse.data.applications || [];
+                    console.log('Fetched applications:', applications.length);
+                    
+                    // Update stats with application count
+                    setStats(prevStats => ({
+                        ...prevStats,
+                        applications: applications.length
+                    }));
+                } else {
+                    // Fallback for applications
+                    console.error('Failed to fetch applications');
+                    setStats(prevStats => ({
+                        ...prevStats,
+                        applications: 0
+                    }));
                 }
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -121,92 +149,148 @@ function Dashboard() {
         );
     }
 
+    // Get current date for welcome message
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+
     return (
         <div className="admin-dashboard">
             <Sidebar />
             <div className="dashboard-content">
                 <div className="dashboard-header">
-                    <h1>Admin Dashboard</h1>
-                    <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                    <div className="welcome-section">
+                        <h1>Admin Dashboard</h1>
+                        <p className="date-display">{formattedDate}</p>
+                    </div>
+                    <div className="header-actions">
+                        <button className="action-button refresh-btn" onClick={() => window.location.reload()}>
+                            <ion-icon name="refresh-outline"></ion-icon> Refresh
+                        </button>
+                        <button className="action-button logout-btn" onClick={handleLogout}>
+                            <ion-icon name="log-out-outline"></ion-icon> Logout
+                        </button>
+                    </div>
                 </div>
 
                 {error && (
                     <div className="error-message">
+                        <ion-icon name="alert-circle-outline"></ion-icon>
                         {error}
                         <button onClick={() => window.location.reload()} className="retry-btn">Retry</button>
                     </div>
                 )}
 
                 <div className="stats-container">
-                    <div className="stat-card">
-                        <h3>Total Users</h3>
-                        <div className="stat-value">{stats.totalUsers}</div>
+                    <div className="stat-card users">
+                        <div className="stat-icon">
+                            <ion-icon name="people-outline"></ion-icon>
+                        </div>
+                        <div className="stat-info">
+                            <h3>Total Users</h3>
+                            <div className="stat-value">{stats.totalUsers}</div>
+                        </div>
                     </div>
-                    <div className="stat-card">
-                        <h3>Total Jobs</h3>
-                        <div className="stat-value">{stats.totalJobs}</div>
+                    <div className="stat-card jobs">
+                        <div className="stat-icon">
+                            <ion-icon name="briefcase-outline"></ion-icon>
+                        </div>
+                        <div className="stat-info">
+                            <h3>Total Jobs</h3>
+                            <div className="stat-value">{stats.totalJobs}</div>
+                        </div>
                     </div>
-                    <div className="stat-card">
-                        <h3>Active Jobs</h3>
-                        <div className="stat-value">{stats.activeJobs}</div>
+                    <div className="stat-card active-jobs">
+                        <div className="stat-icon">
+                            <ion-icon name="checkmark-circle-outline"></ion-icon>
+                        </div>
+                        <div className="stat-info">
+                            <h3>Active Jobs</h3>
+                            <div className="stat-value">{stats.activeJobs}</div>
+                        </div>
                     </div>
-                    <div className="stat-card">
-                        <h3>Applications</h3>
-                        <div className="stat-value">{stats.applications}</div>
+                    <div className="stat-card applications">
+                        <div className="stat-icon">
+                            <ion-icon name="document-text-outline"></ion-icon>
+                        </div>
+                        <div className="stat-info">
+                            <h3>Applications</h3>
+                            <div className="stat-value">{stats.applications}</div>
+                        </div>
                     </div>
                 </div>
 
+
+
                 <div className="dashboard-sections">
-                    <div className="section">
-                        <h2>Recent Jobs</h2>
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Title</th>
-                                    <th>Company</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentJobs.map(job => (
-                                    <tr key={job.id}>
-                                        <td>{job.id}</td>
-                                        <td>{job.title}</td>
-                                        <td>{job.company}</td>
-                                        <td>{new Date(job.date || job.created_at).toLocaleDateString()}</td>
+                    <div className="section recent-jobs">
+                        <div className="section-header">
+                            <h2><ion-icon name="briefcase-outline"></ion-icon> Recent Jobs</h2>
+                            <button className="view-all-btn" onClick={() => navigate('/admin/jobs')}>View All <ion-icon name="arrow-forward-outline"></ion-icon></button>
+                        </div>
+                        <div className="table-responsive">
+                            <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Company</th>
+                                        <th>Date</th>
+                                        {/* Actions column removed */}
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button className="view-all-btn" onClick={() => navigate('/admin/jobs')}>View All Jobs</button>
+                                </thead>
+                                <tbody>
+                                    {recentJobs.map(job => (
+                                        <tr key={job.id}>
+                                            <td>{job.id}</td>
+                                            <td>{job.title}</td>
+                                            <td>{job.company}</td>
+                                            <td>{new Date(job.date || job.created_at).toLocaleDateString()}</td>
+                                            {/* Actions cell removed */}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <div className="section">
-                        <h2>Recent Users</h2>
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentUsers.map(user => (
-                                    <tr key={user.id}>
-                                        <td>{user.id}</td>
-                                        <td>{user.name || user.username}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.role}</td>
-                                        <td>{new Date(user.date || user.created_at).toLocaleDateString()}</td>
+                    <div className="section recent-users">
+                        <div className="section-header">
+                            <h2><ion-icon name="people-outline"></ion-icon> Recent Users</h2>
+                            <button className="view-all-btn" onClick={() => navigate('/admin/users')}>View All <ion-icon name="arrow-forward-outline"></ion-icon></button>
+                        </div>
+                        <div className="table-responsive">
+                            <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Date</th>
+                                        {/* Actions column removed */}
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button className="view-all-btn" onClick={() => navigate('/admin/users')}>View All Users</button>
+                                </thead>
+                                <tbody>
+                                    {recentUsers.map(user => (
+                                        <tr key={user.id}>
+                                            <td>{user.id}</td>
+                                            <td>{user.name || user.username}</td>
+                                            <td>{user.email}</td>
+                                            <td>
+                                                <span className={`role-badge ${user.role}`}>{user.role}</span>
+                                            </td>
+                                            <td>{new Date(user.date || user.created_at).toLocaleDateString()}</td>
+                                            {/* Actions cell removed */}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
