@@ -159,39 +159,6 @@
   color: white;
 }
 
-.invoice-button {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.invoice-button:hover {
-  background-color: #059669;
-}
-
-.secondary-button {
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: 1px solid #d1d5db;
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
 /* Payment Form Container */
 .payment-form-container {
   background-color: white;
@@ -239,7 +206,27 @@
   cursor: not-allowed;
 }
 
-/* Payment Success Styles */
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .payment-container {
+    padding: 1rem;
+  }
+  
+  .plans-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-header h1 {
+    font-size: 2rem;
+  }
+  
+  .payment-form-container {
+    padding: 1.5rem;
+  }
+}
+
+/* Add these styles to your existing PaymentStyles.css file */
+
 .payment-success-container {
   min-height: 100vh;
   background-color: #f8f9fa;

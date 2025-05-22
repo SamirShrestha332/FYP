@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './PaymentStyles.css';
 import RecruiterHeader from '../RecruiterHeader';
-import { FaCheckCircle, FaArrowRight, FaFileInvoice, FaArrowLeft } from 'react-icons/fa';
+import { FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -28,8 +28,7 @@ const PaymentSuccess = () => {
         
         console.log('Transaction ID captured:', transactionId);
         
-        // Always use 'completed' status to match admin payment management terminology
-        const status = 'completed';
+        const status = params.get('status') || 'success';
         const totalAmount = params.get('total_amount');
         
         // Get user data from localStorage
@@ -103,7 +102,7 @@ const PaymentSuccess = () => {
             amount: plan.amount + plan.tax + 10, // Add service charge
             plan_type: selectedPlan,
             payment_method: 'esewa',
-            status: 'completed', // Always use 'completed' status to match admin panel
+            status: status,
             job_posts_allowed: plan.job_posts,
             validity_days: plan.validity_days,
             expiry_date: expiryDate.toISOString().split('T')[0]
@@ -257,12 +256,6 @@ const PaymentSuccess = () => {
             )}
             
             <div className="success-actions">
-              <button 
-                onClick={() => navigate(`/recruiter/payment/invoice/${paymentDetails?.transactionId}`)}
-                className="invoice-button"
-              >
-                <FaFileInvoice /> View Invoice
-              </button>
               <button onClick={handleContinue} className="continue-button">
                 Post a Job Now <FaArrowRight />
               </button>
