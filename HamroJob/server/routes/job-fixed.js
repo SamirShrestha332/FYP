@@ -4,42 +4,6 @@ import { checkSubscription, incrementJobPostCount } from '../utils/subscription.
 
 const router = express.Router();
 
-// GET jobs with application counts for admin dashboard
-router.get('/admin/with-applications', (req, res) => {
-    // This endpoint is specifically for the admin dashboard
-    // It joins the jobs table with applications to count applications per job
-    
-    const query = `
-        SELECT 
-            j.*, 
-            COUNT(a.id) as application_count 
-        FROM 
-            jobs j 
-        LEFT JOIN 
-            applications a ON j.id = a.job_id 
-        GROUP BY 
-            j.id 
-        ORDER BY 
-            j.created_at DESC
-    `;
-    
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching jobs with application counts:', err);
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Error fetching jobs with application counts', 
-                error: err.message 
-            });
-        }
-        
-        res.status(200).json({ 
-            success: true, 
-            jobs: results 
-        });
-    });
-});
-
 // GET all jobs
 router.get('/', (req, res) => {
     const recruiterId = req.query.recruiterId;
@@ -415,35 +379,6 @@ router.post('/create', async (req, res) => {
             });
         }
         
-        // Continue with job creation
-        insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
-    });
-});
-
-// POST job from recruiter interface
-router.post('/recruiter', async (req, res) => {
-    console.log('Received job post request from recruiter interface:', req.body);
-    const { title, company, location, description, requirements, recruiter_id, job_type } = req.body;
-    
-    // Basic validation
-    if (!title || !company || !location || !description || !requirements || !recruiter_id) {
-        return res.status(400).json({ 
-            success: false,
-            message: 'All fields are required' 
-        });
-    }
-    
-    // Check subscription before creating job
-    checkSubscription(recruiter_id, (result) => {
-        if (result.error) {
-            console.log('Subscription check failed:', result.message);
-            return res.status(403).json({ 
-                success: false, 
-                message: result.message 
-            });
-        }
-        
-        console.log('Subscription check passed, creating job');
         // Continue with job creation
         insertJob(req, res, title, company, location, description, requirements, recruiter_id, job_type);
     });

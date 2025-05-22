@@ -19,7 +19,7 @@ function AboutUs() {
         <h2>Our Story</h2>
         <div className="about-content">
           <div className="about-image">
-            <img src="/src/assets/team.jpg" alt="Our Team" />
+            <img src="https://media.istockphoto.com/id/1324904634/photo/multiethnic-young-business-people-working-together-in-the-office.jpg?s=612x612&w=0&k=20&c=rBaY3zUDzZnjDlICJ03y8CCtJzDh_ZQ3z6es4hzfnJ8=" alt="Our Team" />
           </div>
           <div className="about-text">
             <p>
@@ -82,34 +82,8 @@ function AboutUs() {
         </div>
       </div>
 
-      {/* Team Section */}
-      <div className="about-section team-section">
-        <h2>Meet Our Team</h2>
-        <div className="team-grid">
-          <div className="team-member">
-            <div className="member-photo">
-              <img src="/src/assets/team-member-1.jpg" alt="Team Member" />
-            </div>
-            <h3>Samir Shrestha</h3>
-            <p>Founder & CEO</p>
-          </div>
-          <div className="team-member">
-            <div className="member-photo">
-              <img src="/src/assets/team-member-2.jpg" alt="Team Member" />
-            </div>
-            <h3>Aarati Thapa</h3>
-            <p>Chief Technology Officer</p>
-          </div>
-          <div className="team-member">
-            <div className="member-photo">
-              <img src="/src/assets/team-member-3.jpg" alt="Team Member" />
-            </div>
-            <h3>Rajesh Tamang</h3>
-            <p>Head of Operations</p>
-          </div>
-        </div>
-      </div>
-
+     
+      
       {/* Contact Section */}
       <div className="about-section contact-section">
         <h2>Get In Touch</h2>

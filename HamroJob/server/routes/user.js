@@ -1,8 +1,54 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { db } from '../config/db.js';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const router = express.Router();
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: 'dfplmkziu',
+  api_key: '962393579386312',
+  api_secret: 'sCvTFErOCkBUZuO8Kk7ITS8sMhQ'
+});
+
+// Setup multer storage for temporary file storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// Create multer instance with configuration
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for profile images
+  fileFilter: function (req, file, cb) {
+    // Accept only image files
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+  }
+});
 
 // User data route
 router.get('/me', (req, res) => { 
@@ -183,7 +229,7 @@ router.get('/profile', (req, res) => {
     console.log(`Fetching profile data for user with email: ${email}`);
     
     // Query database for user data
-    const query = 'SELECT id, username, email, role, phone, location, bio, skills, status FROM users WHERE email = ?';
+    const query = 'SELECT id, username, email, role, phone, location, bio, skills, status, profile_image FROM users WHERE email = ?';
     console.log('Executing query:', query);
     console.log('With parameters:', [email]);
     
@@ -222,5 +268,118 @@ router.get('/profile', (req, res) => {
     });
 });
 
-// Make sure to use export default at the end of the file
+
+router.get('/all', (req, res) => {
+    console.log('Fetching all users');
+    
+    // Query database for all users
+    const query = 'SELECT id, username as name, email, role, status, created_at as date FROM users ORDER BY created_at DESC';
+    
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching all users:', err);
+            return res.status(500).json({ success: false, message: 'Error fetching users' });
+        }
+        
+        console.log('Successfully fetched', results.length, 'users');
+        
+        res.status(200).json({
+            success: true,
+            users: results
+        });
+    });
+});
+
+// Upload profile image route
+router.post('/profile/upload-image', upload.single('profileImage'), async (req, res) => {
+  // Extract token from header
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'No token provided' });
+  }
+  
+  // Get user email from request body
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Email is required' });
+  }
+  
+  // Check if file was uploaded
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No image file provided' });
+  }
+  
+  try {
+    // Upload image to Cloudinary in the profile_images folder
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'profile_images',
+      use_filename: true,
+      unique_filename: true,
+      overwrite: true,
+      transformation: [{ width: 400, height: 400, crop: 'fill' }]
+    });
+    
+    // Delete the temporary file
+    fs.unlinkSync(req.file.path);
+    
+    // Update user profile with image URL
+    const query = 'UPDATE users SET profile_image = ? WHERE email = ?';
+    db.query(query, [result.secure_url, email], (err, results) => {
+      if (err) {
+        console.error('Error updating profile image:', err);
+        return res.status(500).json({ success: false, message: 'Error updating profile image' });
+      }
+      
+      // Get updated user data to return
+      const getUserQuery = 'SELECT id, username, email, role, phone, location, bio, skills, profile_image FROM users WHERE email = ?';
+      db.query(getUserQuery, [email], (err, userResults) => {
+        if (err) {
+          console.error('Error fetching updated user data:', err);
+          return res.status(200).json({ 
+            success: true, 
+            message: 'Profile image updated successfully',
+            imageUrl: result.secure_url
+          });
+        }
+        
+        if (userResults.length === 0) {
+          return res.status(200).json({ 
+            success: true, 
+            message: 'Profile image updated successfully',
+            imageUrl: result.secure_url
+          });
+        }
+        
+        const updatedUser = userResults[0];
+        
+        // Add profileImage field for compatibility
+        updatedUser.profileImage = updatedUser.profile_image;
+        
+        console.log('Sending updated user data to client:', updatedUser);
+        
+        res.status(200).json({ 
+          success: true, 
+          message: 'Profile image updated successfully',
+          user: updatedUser,
+          imageUrl: result.secure_url
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Error uploading image to Cloudinary:', error);
+    // Clean up the temporary file if it exists
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting temporary file:', unlinkError);
+      }
+    }
+    res.status(500).json({ success: false, message: 'Error uploading image' });
+  }
+});
+
 export default router;

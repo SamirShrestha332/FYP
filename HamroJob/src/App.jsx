@@ -23,6 +23,7 @@ import OTPVerification from './component/OTPVerification';
 import RecruiterSignup from './component/recruiter/RecruiterSignup';
 import RecruiterLogin from './component/recruiter/RecruiterLogin';
 import RecruiterForgotPassword from './component/recruiter/RecruiterForgotPassword';
+import RecruiterOTPVerification from './component/recruiter/RecruiterOTPVerification';
 import RecruiterDashboard from './component/recruiter/RecruiterDashboard';
 import RecruiterJobs from './component/recruiter/RecruiterJobs';
 import RecruiterPostJob from './component/recruiter/RecruiterPostJob';
@@ -92,6 +93,7 @@ function App() {
         <Route path="/recruiter/signup" element={<RecruiterSignup />} />
         <Route path="/recruiter/login" element={<RecruiterLogin />} />
         <Route path="/recruiter/forgot-password" element={<RecruiterForgotPassword />} />
+        <Route path="/recruiter/verify-otp" element={<RecruiterOTPVerification />} />
         <Route path="/recruiter/dashboard" element={
           <ProtectedRoute>
             <RecruiterDashboard />

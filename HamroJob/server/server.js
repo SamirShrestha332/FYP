@@ -4,6 +4,7 @@ import { db, initializeDatabase } from './config/db.js';
 import authRoutes from './routes/auth.js';
 import recruiterRoutes from './routes/recruiter.js';
 import adminRoutes from './routes/admin.js';
+import adminPaymentsRoutes from './routes/admin-payments.js';
 import userRoutes from './routes/user.js';
 import jobRoutes from './routes/job.js';
 import applicationsRoutes from './routes/applications.js'; // Changed to ES module import
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', authRoutes);
 app.use('/api/recruiter', recruiterRoutes);
 app.use('/api/admin', adminRoutes); // Changed from '/admin' to '/api/admin' to match frontend
+app.use('/api/admin', adminPaymentsRoutes); // Admin payment routes
 app.use('/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/job', jobRoutes); // Add this line to handle the job posting route

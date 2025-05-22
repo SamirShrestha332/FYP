@@ -1,0 +1,158 @@
+/* OTP Verification Styles for Recruiter */
+.otp-card {
+  max-width: 500px;
+  padding: 2rem;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 2rem 0;
+}
+
+.otp-inputs input {
+  width: 50px;
+  height: 60px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: all 0.2s;
+}
+
+.otp-inputs input:focus {
+  border-color: #1e88e5;
+  box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+  background-color: #fff;
+}
+
+.otp-inputs input.active {
+  animation: pulse 0.5s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.timer-container p {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #1e88e5;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.resend-button:hover:not(.disabled) {
+  background-color: rgba(30, 136, 229, 0.1);
+}
+
+.resend-button.disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.otp-footer {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.text-button {
+  background: none;
+  border: none;
+  color: #1e88e5;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.text-button:hover {
+  color: #1565c0;
+}
+
+.email {
+  font-weight: 600;
+  color: #333;
+}
+
+.success-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.success-icon {
+  margin-bottom: 1rem;
+  animation: scale-in 0.5s ease-out;
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-popup h2 {
+  color: #4BB543;
+  margin-bottom: 0.5rem;
+}
+
+.success-popup p {
+  color: #666;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+  .otp-inputs input {
+    width: 40px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .otp-card {
+    padding: 1.5rem;
+  }
+}

@@ -429,4 +429,35 @@ router.put('/:applicationId/status', (req, res) => {
   });
 });
 
+// GET endpoint to fetch all applications for admin dashboard
+router.get('/admin/all', (req, res) => {
+  console.log('Fetching all applications for admin dashboard - NO AUTH REQUIRED (FOR TESTING)');
+  
+  const query = `
+    SELECT a.*, j.title as job_title, j.company, u.username as applicant_name, u.email as applicant_email
+    FROM applications a
+    JOIN jobs j ON a.job_id = j.id
+    JOIN users u ON a.user_id = u.id
+    ORDER BY a.created_at DESC
+  `;
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching all applications:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch applications',
+        error: err.message
+      });
+    }
+    
+    console.log(`Successfully fetched ${results.length} applications`);
+    
+    res.status(200).json({
+      success: true,
+      applications: results
+    });
+  });
+});
+
 export default router;

@@ -160,9 +160,12 @@ function RecruiterSignup() {
             setLoading(false);
             
             if (response.data.success) {
-                setModalMessage("Account created successfully! You can now log in.");
-                setModalIsOpen(true);
-                // Redirect to login after modal is closed
+                // Navigate to the RecruiterOTPVerification component with the email
+                navigate('/recruiter/verify-otp', { 
+                    state: { 
+                        email 
+                    } 
+                });
             } else {
                 setError(response.data.message || "An error occurred during signup");
             }
