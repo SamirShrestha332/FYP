@@ -39,7 +39,6 @@ import Esewapayment from './component/recruiter/Payment/EsewaPayment.jsx';
 import ProtectedJobRoute from './component/recruiter/ProtectedJobRoute';
 
 import PaymentSuccess from './component/recruiter/Payment/PaymentSuccess';
-import PaymentInvoice from './component/recruiter/Payment/PaymentInvoice';
 import ApplicationDetails from './component/ApplicationDetails';
 // Add this import at the top with your other imports
 
@@ -84,11 +83,6 @@ function App() {
         <Route path="/recruiter/payment/success" element={
           <ProtectedRoute>
             <PaymentSuccess />
-          </ProtectedRoute>
-        } />
-        <Route path="/recruiter/payment/invoice/:transactionId" element={
-          <ProtectedRoute>
-            <PaymentInvoice />
           </ProtectedRoute>
         } />
         <Route path="/payment/success" element={

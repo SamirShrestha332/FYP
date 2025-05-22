@@ -39,6 +39,7 @@
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -90,8 +91,10 @@
 .meta-item {
   display: flex;
   align-items: flex-start;
-  font-size: 0.875rem;
   color: #4a5568;
+  
+  font-weight: 300;
+  font-size: 0.85rem;
 }
 
 .meta-item svg {
@@ -128,6 +131,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
+  width: 133px;
 }
 
 .view-btn {

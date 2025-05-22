@@ -6,12 +6,23 @@
 .user-menu-trigger {
   display: flex;
   align-items: center;
-  cursor: pointer;
-  padding: 5px 10px;
+  gap: 8px;
+  padding: 8px 12px;
   border-radius: 4px;
-  transition: all 0.3s;
-  color: #007bff; /* Blue to match homepage theme */
-  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.user-menu-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eee;
 }
 
 .user-icon {
@@ -56,8 +67,36 @@
 
 .user-info {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 15px;
+  gap: 15px;
+}
+
+.user-avatar {
+  flex-shrink: 0;
+}
+
+.dropdown-avatar-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-avatar-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .user-details {

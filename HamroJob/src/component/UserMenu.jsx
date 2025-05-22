@@ -125,7 +125,15 @@ function UserMenu({ userData: propUserData }) {
   return (
     <div className="user-menu-container" ref={menuRef}>
       <div className="user-menu-trigger" onClick={toggleMenu}>
-        <ion-icon name="person-circle-outline" class="user-icon"></ion-icon>
+        {userData && (userData.profile_image || userData.profileImage) ? (
+          <img 
+            src={userData.profile_image || userData.profileImage} 
+            alt="Profile" 
+            className="user-avatar-img" 
+          />
+        ) : (
+          <ion-icon name="person-circle-outline" class="user-icon"></ion-icon>
+        )}
         <span className="user-name">{userData ? userData.username : 'User'}</span>
         <ion-icon name={isOpen ? "chevron-up-outline" : "chevron-down-outline"}></ion-icon>
       </div>

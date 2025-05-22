@@ -19,6 +19,9 @@ function UserProfile() {
     bio: '',
     skills: ''
   });
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
@@ -106,6 +109,90 @@ function UserProfile() {
       ...formData,
       [name]: value
     });
+  };
+  
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type and size
+      if (!file.type.match('image.*')) {
+        setError('Please select an image file');
+        return;
+      }
+      
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        setError('Image size should be less than 10MB');
+        return;
+      }
+      
+      setProfileImage(file);
+      setError(null); // Clear any previous errors
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        console.log('Image preview created');
+        setImagePreview(reader.result);
+        setSuccessMessage('Image preview created. Click Upload to save.');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      };
+      reader.onerror = () => {
+        console.error('Error creating image preview');
+        setError('Failed to preview image. Please try another file.');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleImageUpload = async () => {
+    if (!profileImage) {
+      return;
+    }
+    
+    setUploadingImage(true);
+    setError(null);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('profileImage', profileImage);
+      formData.append('email', user.email);
+      
+      const response = await axios.post(
+        'http://localhost:5000/users/profile/upload-image',
+        formData,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          } 
+        }
+      );
+      
+      console.log('Profile image upload response:', response.data);
+      
+      if (response.data && response.data.success) {
+        // Update user state with new image URL
+        if (response.data.user) {
+          setUser(response.data.user);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        } else if (response.data.imageUrl) {
+          // If full user object not returned, update just the image URL
+          const updatedUser = { ...user, profile_image: response.data.imageUrl };
+          setUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+        
+        setSuccessMessage('Profile image updated successfully!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }
+    } catch (err) {
+      console.error('Error uploading profile image:', err);
+      setError('Failed to upload profile image. Please try again.');
+    } finally {
+      setUploadingImage(false);
+      setProfileImage(null); // Reset file input
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -237,8 +324,43 @@ function UserProfile() {
               {error && <div className="error-message">{error}</div>}
               
               <div className="profile-header-content">
-                <div className="profile-avatar">
-                  {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                <div className="profile-image-container">
+                  <div className={`profile-image ${imagePreview ? 'has-preview' : ''}`}>
+                    {imagePreview ? (
+                      <>
+                        <img src={imagePreview} alt="Profile Preview" />
+                        <div className="preview-indicator">Preview</div>
+                      </>
+                    ) : user.profile_image ? (
+                      <img src={user.profile_image} alt="Profile" />
+                    ) : (
+                      <div className="profile-placeholder">
+                        {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="profile-image-upload">
+                    <input
+                      type="file"
+                      id="profile-image-input"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="profile-image-input" className="upload-button">
+                      Change Photo
+                    </label>
+                    {profileImage && (
+                      <button
+                        onClick={handleImageUpload}
+                        className="upload-button"
+                        disabled={uploadingImage}
+                        type="button"
+                      >
+                        {uploadingImage ? 'Uploading...' : 'Upload'}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="profile-info">
                   <h2>{user.username || 'User'}</h2>
